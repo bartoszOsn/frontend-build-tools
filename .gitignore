@@ -1,3 +1,4 @@
 # Project exclude paths
 /module-bundler/node_modules/
 /node_modules/
+/module-bundler/coverage/
