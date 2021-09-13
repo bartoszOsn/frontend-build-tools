@@ -1,0 +1,16 @@
+{
+  "name": "module-bundler",
+  "version": "0.0.1",
+  "description": "A custom module bundler",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^27.0.1",
+    "jest": "^27.1.0",
+    "ts-jest": "^27.0.5",
+    "typescript": "^4.4.2"
+  },
+  "scripts": {
+    "test": "jest"
+  }
+}

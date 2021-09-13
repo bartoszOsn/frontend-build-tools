@@ -1,0 +1,10 @@
+{
+  "name": "own-frontend-ecosystem",
+  "version": "0.0.1",
+  "description": "Custom tools for frontend development – a module bundler, css preprocessor and html preprocessor",
+  "main": " ",
+  "author": "Bartosz Osiński",
+  "license": "MIT",
+  "private": true,
+  "workspaces": ["module-bundler"]
+}
