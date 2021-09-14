@@ -2,11 +2,12 @@
     The object that will be provided in compilation time:
     {
         randomHash: string; // a random hash
-        modules: Module[] // an object representation of module
+        modules: Module[]; // an object representation of module
+        mainModule: number; // index of entry point module
     }
 
     interface Module {
-        hash: string; // a hash of module path relative to root module
+        hash: string; // a hash of absolute module
         content: string; // already transformed content of module file,
         requireFunction: string // a name of require function to use
         moduleName: string // a name of module object
