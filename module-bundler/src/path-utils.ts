@@ -96,7 +96,7 @@ function resolvePathInternal(modulePath: string, currentModulePath: string, root
 
     for (const alias of aliases) {
         if (modulePath.startsWith(alias + path.sep)) {
-            const newModulePath = modulePath.replace(alias, pathAliases[alias])
+            const newModulePath = path.resolve(rootPath, modulePath.replace(alias, pathAliases[alias]));
             try {
                 return resolvePathInternal(newModulePath, currentModulePath, rootPath, {}, dependencyModulePaths);
             } catch {}

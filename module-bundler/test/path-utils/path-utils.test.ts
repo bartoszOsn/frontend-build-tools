@@ -100,4 +100,25 @@ describe('resolvePath()', function () {
             }
         }
     });
+
+    testPathResolve({
+        message: 'alias',
+        newModulePath: '@app/module.js',
+        rootDirectoryPath: 'C:/root',
+        expectedPath: 'C:/root/src/app/module.js',
+        pathAliases: {
+            '@app': './src/app'
+        },
+        fileStructure: {
+            'C:': {
+                root: {
+                    src: {
+                        app: {
+                            'module.js': true
+                        }
+                    }
+                }
+            }
+        }
+    });
 });
