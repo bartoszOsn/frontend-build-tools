@@ -3,7 +3,11 @@ import path from 'path';
 import { Module } from "./domain/module";
 import { hashPath } from "./path-utils";
 
-export function transformModule(modulePath: string, rootPath: string): Module {
+
+
+export function transformModule(modulePath: string, rootPath: string, requireFunction: string, moduleName: string, exportsName: string): Module {
+    const hash = hashPath(modulePath);
+
 
 
     return null;

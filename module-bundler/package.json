@@ -12,5 +12,11 @@
   },
   "scripts": {
     "test": "jest"
+  },
+  "dependencies": {
+    "@types/acorn": "^4.0.6",
+    "@types/estree": "^0.0.50",
+    "acorn": "^8.5.0",
+    "escodegen": "^2.0.0"
   }
 }
