@@ -4,4 +4,5 @@ export interface Module {
     requireFunction: string;
     moduleName: string;
     exportsName: string;
+    importPaths: string[];
 }
