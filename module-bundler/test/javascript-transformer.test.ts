@@ -1,6 +1,6 @@
 import {javascriptTransformer} from "../src/Javascript-transformer";
 import { Node } from "acorn";
-import {ImportDeclaration, Identifier, VariableDeclaration, ImportSpecifier} from 'estree';
+import {ImportDeclaration, Identifier, VariableDeclaration, ImportSpecifier, BlockStatement} from 'estree';
 
 describe('javascriptTransformer()', () => {
     test('basic', () => {
@@ -49,5 +49,53 @@ describe('javascriptTransformer()', () => {
             }});
 
         expect(newCode).toMatch('const fn = require(\'module_@fn\');\nfn();');
+    });
+
+    test('should provide proper block in transform function', function () {
+
+        const code = `
+            let a = 5;
+            if(a == 5) {
+              let b = "example";
+            }
+        `;
+
+        javascriptTransformer(code, {
+            'Identifier': (node: Identifier, block: any, functionBody: BlockStatement) => {
+                if(node.name === 'b') {
+                    expect(block).toBeDefined();
+                    expect(block?.body?.[0]?.declarations?.[0]?.id?.name).toMatch('b');
+                }
+
+                return node;
+            }
+        });
+
+        expect.hasAssertions();
+    });
+
+    test('should provide proper function block in transform function', function () {
+
+        const code = `
+            function fn() {
+                let a = 5;
+            }
+        `;
+
+        javascriptTransformer(code, {
+            'Identifier': (node: Identifier, block: any, functionBody: any) => {
+                if(node.name === 'fn') {
+                    expect(functionBody).toBeNull();
+                }
+                if(node.name === 'a') {
+                    expect(functionBody).toBeDefined();
+                    expect(functionBody?.body?.["0"]?.declarations?.["0"]?.id?.name).toMatch('a');
+                }
+
+                return node;
+            }
+        });
+
+        expect.hasAssertions();
     });
 });
