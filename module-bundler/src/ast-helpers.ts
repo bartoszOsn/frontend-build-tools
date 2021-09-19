@@ -49,6 +49,14 @@ function createVariableDeclarator(properties: {[key: string]: string}, init: Cal
     };
 }
 
+function createNamespaceVariableDeclarator(defaultNamespaceName: string, init: CallExpression): VariableDeclarator {
+    return {
+        type: 'VariableDeclarator',
+        init: init,
+        id: createIdentifier(defaultNamespaceName)
+    };
+}
+
 function createCallExpression(requireFunctionName: string, requireFunctionArgument: string): CallExpression {
     return {
         type: 'CallExpression',
@@ -58,10 +66,20 @@ function createCallExpression(requireFunctionName: string, requireFunctionArgume
     };
 }
 
-export function createVariableDeclaration(properties: {[key: string]: string}, requireFunctionName: string, requireFunctionArgument: string): VariableDeclaration {
+export function createVariableDeclaration(properties: {[key: string]: string}, defaultNamespaceName: string, requireFunctionName: string, requireFunctionArgument: string): VariableDeclaration {
+    const declarations: VariableDeclarator[] = [];
+
+    if(Object.keys(properties).length > 0) {
+        declarations.push(createVariableDeclarator(properties, createCallExpression(requireFunctionName, requireFunctionArgument)));
+    }
+
+    if(defaultNamespaceName) {
+        declarations.push(createNamespaceVariableDeclarator(defaultNamespaceName, createCallExpression(requireFunctionName, requireFunctionArgument)));
+    }
+
     return {
         type: 'VariableDeclaration',
         kind: 'const',
-        declarations: [createVariableDeclarator(properties, createCallExpression(requireFunctionName, requireFunctionArgument))]
+        declarations: declarations
     };
 }

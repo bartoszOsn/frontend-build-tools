@@ -6,6 +6,9 @@ describe('javascriptTransformer()', () => {
     test('basic', () => {
         const code = 'const a = fn(2 + 2);';
         const newCode = javascriptTransformer(code, { 'Identifier': (node: Identifier) => {
+            if (node.name !== 'fn') {
+                return node;
+            }
             const newNode = {...node};
             newNode.name = 'b';
             return newNode;
