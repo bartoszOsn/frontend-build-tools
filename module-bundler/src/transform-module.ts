@@ -4,16 +4,25 @@ import { Module } from "./domain/module";
 import { hashPath, resolvePath } from "./path-utils";
 import fs from "fs";
 import { javascriptTransformer } from "./Javascript-transformer";
-import { ExportAllDeclaration, ExpressionStatement, ImportDeclaration, VariableDeclaration } from "estree";
-import { createVariableDeclaration } from "./ast-helpers";
+import {
+	CallExpression,
+	ExportAllDeclaration, ExportNamedDeclaration,
+	ExpressionStatement,
+	Identifier,
+	ImportDeclaration,
+	MemberExpression,
+	VariableDeclaration
+} from "estree";
+import { createVariableDeclaration, createCallExpression } from "./ast-helpers";
 
-export function transformModule(modulePath: string, rootPath: string, requireFunction: string, moduleName: string, exportsName: string): Module {
+export function transformModule(modulePath: string, rootPath: string, requireFunction: string, exportsName: string): Module {
 	const hash = hashPath(modulePath);
-	const importedPaths = [];
+	const importedPaths: string[] = [];
+	const exportedIdentifiers: {kind: 'var' | 'let', name: string}[] = [];
 
 	const code = fs.readFileSync(modulePath).toString();
 
-	function transformImport(node: ImportDeclaration): VariableDeclaration {
+	function transformImport(node: ImportDeclaration): VariableDeclaration | CallExpression {
 		const path = node.source.value as string;
 		const absPath = resolvePath(path, modulePath, rootPath, {}, [] /* TODO */);
 		const hash = hashPath(absPath);
@@ -32,17 +41,35 @@ export function transformModule(modulePath: string, rootPath: string, requireFun
 			}
 		}
 
+		if(Object.keys(properties).length === 0 && !namespaceName) {
+			return createCallExpression(requireFunction, hash);
+		}
+
 		return createVariableDeclaration(properties, namespaceName, requireFunction, hash);
 	}
 
-	function transformExport(node: ExportAllDeclaration): ExpressionStatement {
+	function transformNamedExport(node: ExportNamedDeclaration): ExpressionStatement {
 
+
+		return node as unknown as ExpressionStatement;
+	}
+
+	function transformIdentifier(node: Identifier): Identifier | MemberExpression {
+		return node;
 	}
 
 	const newCode = javascriptTransformer(code, {
 		'ImportDeclaration': transformImport,
-		'ExportAllDeclaration': transformExport
-	})
+		'ExportNamedDeclaration': transformNamedExport,
+		'Identifier': transformIdentifier
+	});
 
-	return null;
+	return {
+		content: newCode,
+		moduleName: modulePath,
+		hash: hash,
+		exportsName: exportsName,
+		requireFunction: requireFunction,
+		importPaths: importedPaths
+	};
 }

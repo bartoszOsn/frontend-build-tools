@@ -1,11 +1,13 @@
-jest.mock('fs');
-import * as fs from 'fs';
+// jest.mock('fs');
+// import * as fs from 'fs';
+import mockFs, { restore } from 'mock-fs';
 
 import {PathAliases} from "../../src/domain/path-aliases";
 import {normalizeSeparator, resolvePath} from "../../src/path-utils";
+import * as Buffer from "buffer";
 
 export interface FileStructure {
-    [key: string]: FileStructure | true
+    [key: string]: FileStructure | string | Buffer
 }
 
 interface PathResolveTestOptions {
@@ -34,14 +36,12 @@ export function testPathResolve(config: Partial<PathResolveTestOptions>) {
     const usedConfig: PathResolveTestOptions = {...defaults, ...config};
 
     test(usedConfig.message, () => {
-
-        // @ts-ignore
-        fs.__setMockFileStructure(usedConfig.fileStructure)
+        mockFs(usedConfig.fileStructure);
 
         const modulePath = resolvePath(usedConfig.newModulePath, usedConfig.currentModulePath, usedConfig.rootDirectoryPath, usedConfig.pathAliases, usedConfig.dependencyModulePaths);
         expect(modulePath).toMatch(normalizeSeparator(usedConfig.expectedPath));
 
 
-        jest.unmock('fs');
+        restore();
     });
 }

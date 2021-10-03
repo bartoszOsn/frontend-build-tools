@@ -57,7 +57,7 @@ function createNamespaceVariableDeclarator(defaultNamespaceName: string, init: C
     };
 }
 
-function createCallExpression(requireFunctionName: string, requireFunctionArgument: string): CallExpression {
+export function createCallExpression(requireFunctionName: string, requireFunctionArgument: string): CallExpression {
     return {
         type: 'CallExpression',
         optional: false,

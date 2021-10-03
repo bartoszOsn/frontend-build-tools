@@ -1,5 +1,3 @@
-jest.mock('fs');
-
 import {hashPath, normalizeSeparator, resolvePath} from "../../src/path-utils";
 import {PathAliases} from "../../src/domain/path-aliases";
 import {testPathResolve} from "./utils";
@@ -27,15 +25,13 @@ test('path hash function must be deterministic', () => {
 describe('resolvePath()', function () {
 
     testPathResolve({
-        newModulePath: 'C:/root/a/newModule',
-        expectedPath: 'C:/root/a/newModule.js',
+        newModulePath: '/root/a/newModule',
+        expectedPath: '/root/a/newModule.js',
         message:  'absolute path is returned as is',
         fileStructure: {
-            'C:': {
-                root: {
-                    a: {
-                        'newModule.js': true
-                    }
+            '/root': {
+                a: {
+                    'newModule.js': ''
                 }
             }
         }
@@ -44,19 +40,17 @@ describe('resolvePath()', function () {
     testPathResolve({
         message: 'relative path',
         newModulePath: './b/c/newModule',
-        currentModulePath: 'C:/root/a/currentModule.js',
-        expectedPath: 'C:/root/a/b/c/newModule.js',
+        currentModulePath: '/root/a/currentModule.js',
+        expectedPath: '/root/a/b/c/newModule.js',
         fileStructure: {
-            'C:': {
-                root: {
-                    a: {
-                        b: {
-                            c: {
-                                'newModule.js': true
-                            }
-                        },
-                        'currentModule.js': true
-                    }
+            '/root': {
+                a: {
+                    b: {
+                        c: {
+                            'newModule.js': ''
+                        }
+                    },
+                    'currentModule.js': ''
                 }
             }
         }
@@ -65,17 +59,15 @@ describe('resolvePath()', function () {
     testPathResolve({
         message: 'partial path is returned relative to root directory, if file exists',
         newModulePath: 'src/app/module',
-        currentModulePath: 'C:/root/index.js',
-        rootDirectoryPath: 'C:/root',
-        expectedPath: 'C:/root/src/app/module.js',
+        currentModulePath: '/root/index.js',
+        rootDirectoryPath: '/root',
+        expectedPath: '/root/src/app/module.js',
         fileStructure: {
-            'C:': {
-                root: {
-                    'index.js': true,
-                    src: {
-                        app: {
-                            'module.js': true
-                        }
+            '/root': {
+                'index.js': '',
+                src: {
+                    app: {
+                        'module.js': ''
                     }
                 }
             }
@@ -85,16 +77,14 @@ describe('resolvePath()', function () {
     testPathResolve({
         message: 'return from dependency modules only, if file exists',
         newModulePath: '@pkg',
-        rootDirectoryPath: 'C:/root',
-        expectedPath: 'C:/root/node_modules/@pkg/index.js',
+        rootDirectoryPath: '/root',
+        expectedPath: '/root/node_modules/@pkg/index.js',
         dependencyModulePaths: ['./node_modules'],
         fileStructure: {
-            'C:': {
-                root: {
-                    node_modules: {
-                        '@pkg': {
-                            'index.js': true
-                        }
+            '/root': {
+                node_modules: {
+                    '@pkg': {
+                        'index.js': ''
                     }
                 }
             }
@@ -104,18 +94,16 @@ describe('resolvePath()', function () {
     testPathResolve({
         message: 'alias',
         newModulePath: '@app/module.js',
-        rootDirectoryPath: 'C:/root',
-        expectedPath: 'C:/root/src/app/module.js',
+        rootDirectoryPath: '/root',
+        expectedPath: '/root/src/app/module.js',
         pathAliases: {
             '@app': './src/app'
         },
         fileStructure: {
-            'C:': {
-                root: {
-                    src: {
-                        app: {
-                            'module.js': true
-                        }
+            '/root': {
+                src: {
+                    app: {
+                        'module.js': ''
                     }
                 }
             }
