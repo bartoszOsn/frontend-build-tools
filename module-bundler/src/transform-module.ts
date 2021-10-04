@@ -48,6 +48,30 @@ export function transformModule(modulePath: string, rootPath: string, requireFun
 		return createVariableDeclaration(properties, namespaceName, requireFunction, hash);
 	}
 
+	function transformRequire(node: CallExpression): CallExpression {
+		if (node.callee.type !== 'Identifier') {
+			return node;
+		}
+
+		if (node.arguments.length === 0) {
+			return node;
+		}
+
+		if (node.arguments[0].type !== 'Literal') {
+			return node;
+		}
+
+		if (node.callee.name === 'require') {
+			node.callee.name = requireFunction;
+		}
+
+
+		// TODO do funkcji to
+		const absPath = resolvePath(node.arguments[0].value.toString(), modulePath, rootPath, {}, [] /* TODO */);
+		const hash = hashPath(absPath);
+		importedPaths.push(absPath);
+	}
+
 	function transformNamedExport(node: ExportNamedDeclaration): ExpressionStatement {
 
 
@@ -60,6 +84,7 @@ export function transformModule(modulePath: string, rootPath: string, requireFun
 
 	const newCode = javascriptTransformer(code, {
 		'ImportDeclaration': transformImport,
+		'CallExpression': transformRequire,
 		'ExportNamedDeclaration': transformNamedExport,
 		'Identifier': transformIdentifier
 	});
