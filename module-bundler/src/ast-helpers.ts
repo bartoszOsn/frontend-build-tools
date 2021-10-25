@@ -1,13 +1,14 @@
 import {
+    AssignmentExpression,
     AssignmentProperty,
-    CallExpression,
-    Identifier, Literal,
-    ObjectPattern,
+    CallExpression, Expression,
+    Identifier, Literal, MemberExpression,
+    ObjectPattern, SequenceExpression, UnaryExpression, UnaryOperator,
     VariableDeclaration,
     VariableDeclarator
 } from "estree";
 
-function createLiteral(value: string): Literal {
+function createLiteral(value: string | number): Literal {
     return {
         type: 'Literal',
         value: value,
@@ -81,5 +82,40 @@ export function createVariableDeclaration(properties: {[key: string]: string}, d
         type: 'VariableDeclaration',
         kind: 'const',
         declarations: declarations
+    };
+}
+
+export function createMemberExpression(objName: string, literalName: string): MemberExpression {
+    return {
+        type: 'MemberExpression',
+        object: createIdentifier(objName),
+        property: createIdentifier(literalName),
+        computed: false,
+        optional: false
+    };
+}
+
+export function createAssigmentExpression(leftSide: MemberExpression, rightSide: Expression): AssignmentExpression {
+    return {
+        type: "AssignmentExpression",
+        operator: '=',
+        left: leftSide,
+        right: rightSide
+    };
+}
+
+export function createVoid0Expression(): UnaryExpression {
+    return {
+        type: "UnaryExpression",
+        operator: "void",
+        prefix: true,
+        argument: createLiteral(0)
+    }
+}
+
+export function createSequenceExpression(expressions: Expression[]): SequenceExpression {
+    return {
+        type: "SequenceExpression",
+        expressions: expressions
     };
 }

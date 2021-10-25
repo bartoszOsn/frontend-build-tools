@@ -2,7 +2,7 @@ import * as acorn from "acorn";
 import * as escodegen from 'escodegen';
 import {BaseNode, BlockStatement, FunctionDeclaration} from "estree";
 
-type TransformFunc = (node: BaseNode, block: BlockStatement, functionBody: BlockStatement) => BaseNode;
+type TransformFunc = (node: BaseNode, block: BlockStatement, functionBody: BlockStatement, parent: BaseNode) => BaseNode;
 interface TransformObject {
     [NodeType: string]: TransformFunc;
 }
@@ -32,7 +32,7 @@ export function javascriptTransformer(code: string, transforms: TransformObject)
             const keys = Object.keys(transforms);
             for (const transformKey of keys) {
                 if (transformKey === nodeData.node.type) {
-                    newNode = transforms[transformKey](nodeData.node, nodeData.block, nodeData.functionBody);
+                    newNode = transforms[transformKey](nodeData.node, nodeData.block, nodeData.functionBody, nodeData.parent);
                     break;
                 }
             }

@@ -13,7 +13,7 @@ export interface BundleOutputOptions extends BundleOptions {
 export class Bundler {
 	getOutputModuleContent(options: BundleOptions) {
 		const loader = selectLoader(options.entry, options.loaders);
-		return loader.GetBundledModule(options.entry);
+		return loader.GetTransformedModule(options.entry);
 	}
 
 	bundle(options: BundleOutputOptions) {

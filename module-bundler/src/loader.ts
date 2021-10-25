@@ -1,4 +1,6 @@
+import { Module } from "./domain/module";
+
 export abstract class Loader {
 	public pattern: string | RegExp
-	public abstract GetBundledModule(path: string): string;
+	public abstract GetTransformedModule(path: string): Module;
 }

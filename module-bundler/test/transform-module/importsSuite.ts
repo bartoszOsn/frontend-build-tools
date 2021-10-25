@@ -17,7 +17,7 @@ function testImport(oldCode: string, expectedCode: string) {
 	});
 }
 
-export function imports() {
+export function importsSuite() {
 	testImport('import defaultExport from "module-name";', 'const {default: defaultExport} = require(\'module-name\');');
 	testImport('import * as name from "module-name";', 'const name = require(\'module-name\');');
 	testImport('import { export1 } from "module-name";', 'const {export1: export1} = require(\'module-name\');');

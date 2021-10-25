@@ -5,20 +5,25 @@ import { hashPath, resolvePath } from "./path-utils";
 import fs from "fs";
 import { javascriptTransformer } from "./Javascript-transformer";
 import {
-	CallExpression,
-	ExportAllDeclaration, ExportNamedDeclaration,
-	ExpressionStatement,
+	CallExpression, ClassExpression,
+	ExportAllDeclaration, ExportNamedDeclaration, Expression,
+	ExpressionStatement, FunctionExpression,
 	Identifier,
 	ImportDeclaration,
-	MemberExpression,
+	MemberExpression, SequenceExpression,
 	VariableDeclaration
 } from "estree";
-import { createVariableDeclaration, createCallExpression } from "./ast-helpers";
+import {
+	createVariableDeclaration,
+	createCallExpression,
+	createAssigmentExpression,
+	createMemberExpression, createVoid0Expression, createSequenceExpression
+} from "./ast-helpers";
 
 export function transformModule(modulePath: string, rootPath: string, requireFunction: string, exportsName: string): Module {
 	const hash = hashPath(modulePath);
 	const importedPaths: string[] = [];
-	const exportedIdentifiers: {kind: 'var' | 'let', name: string}[] = [];
+	const exportedIdentifiers: {kind: 'var' | 'let' | 'const', name: string}[] = [];
 
 	const code = fs.readFileSync(modulePath).toString();
 
@@ -68,24 +73,80 @@ export function transformModule(modulePath: string, rootPath: string, requireFun
 
 		// TODO do funkcji to
 		const absPath = resolvePath(node.arguments[0].value.toString(), modulePath, rootPath, {}, [] /* TODO */);
-		const hash = hashPath(absPath);
 		importedPaths.push(absPath);
 	}
 
-	function transformNamedExport(node: ExportNamedDeclaration): ExpressionStatement {
+	function transformNamedExport(node: ExportNamedDeclaration): ExpressionStatement | SequenceExpression {
+		if (node.declaration?.type === 'VariableDeclaration') {
+			const kind = node.declaration.kind;
+			const expressionStatements: Expression[] = [];
+			for (const declaration of node.declaration.declarations) {
+				const name = (declaration.id as Identifier).name;
+				const init = declaration.init ?? createVoid0Expression();
 
+				exportedIdentifiers.push({ kind, name });
+
+				expressionStatements.push(createAssigmentExpression(createMemberExpression(exportsName, name), init));
+			}
+
+			if (expressionStatements.length === 1) {
+				return {
+					type: 'ExpressionStatement',
+					expression: expressionStatements[0]
+				}
+			} else {
+				return createSequenceExpression(expressionStatements);
+			}
+		} else if (node.declaration?.type === 'FunctionDeclaration') {
+			const name = node.declaration.id.name;
+			return {
+				type: 'ExpressionStatement',
+				expression: createAssigmentExpression(
+					createMemberExpression(exportsName, name),
+					{
+						...node.declaration,
+						type: 'FunctionExpression'
+					} as FunctionExpression
+				)
+			};
+		} else if (node.declaration?.type === 'ClassDeclaration') {
+			const name = node.declaration.id.name;
+			return {
+				type: 'ExpressionStatement',
+				expression: createAssigmentExpression(
+					createMemberExpression(exportsName, name),
+					{
+						...node.declaration,
+						type: 'ClassExpression'
+					} as ClassExpression
+				)
+			}
+		}
 
 		return node as unknown as ExpressionStatement;
 	}
 
-	function transformIdentifier(node: Identifier): Identifier | MemberExpression {
+	function transformIdentifier(node: Identifier, _a, _b, parent): Identifier | MemberExpression {
+		// TODO: transform literals to exports.XXX within scope.
+		if (parent.type === 'MemberExpression') {
+			return node;
+		}
+		const exportedIdentifier = exportedIdentifiers.find(i => i.name === node.name);
+
+		if (exportedIdentifier) {
+			return createMemberExpression(exportsName, node.name);
+		}
+
 		return node;
 	}
 
-	const newCode = javascriptTransformer(code, {
+	let newCode = javascriptTransformer(code, {
 		'ImportDeclaration': transformImport,
 		'CallExpression': transformRequire,
-		'ExportNamedDeclaration': transformNamedExport,
+		'ExportNamedDeclaration': transformNamedExport
+	});
+
+	newCode = javascriptTransformer(newCode, {
 		'Identifier': transformIdentifier
 	});
 
