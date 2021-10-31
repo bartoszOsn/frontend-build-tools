@@ -19,10 +19,10 @@ function testExport(oldCode: string, expectedCode: string) {
 
 export function exportsSuite() {
 	testExport('export let a;a = 5;', 'exports.a = void 0;\nexports.a = 5;');
-	testExport('export let a, b;a = 5; b = 10;', 'exports.a = void 0, exports.b = void 0;\nexports.a = 5;\nexports.b = 10;');
+	testExport('export let a, b;a = 5; b = 10;', '(exports.a = void 0, exports.b = void 0)\nexports.a = 5;\nexports.b = 10;');
 
 	testExport('export let a = 5;', 'exports.a = 5;');
-	testExport('export let a = 5, b = 10;', 'exports.a = 5, exports.b = 10;');
+	testExport('export let a = 5, b = 10;', '(exports.a = 5, exports.b = 10)');
 
 	testExport('export function func(){}', 'exports.func = function func() {\n}');
 

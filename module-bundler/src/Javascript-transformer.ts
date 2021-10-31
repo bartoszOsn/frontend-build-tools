@@ -19,65 +19,67 @@ function isNode(obj: any): boolean {
     return !!obj && typeof obj === 'object' && typeof obj.type == 'string';
 }
 
-export function javascriptTransformer(code: string, transforms: TransformObject): string {
+export function javascriptTransformer(code: string, transforms: TransformObject[]): string {
     const ast: BaseNode = acorn.parse(code, { ecmaVersion: 2022, sourceType: "module" });
 
-    const nodeQuery: NodeData[] = [{ node: ast, parent: null, parentKey: null, block: null, functionBody: null}];
+    for (const transform of transforms) {
+        const nodeQuery: NodeData[] = [{ node: ast, parent: null, parentKey: null, block: null, functionBody: null}];
 
-    while (nodeQuery.length > 0) {
-        const nodeData: NodeData = nodeQuery.pop();
+        while (nodeQuery.length > 0) {
+            const nodeData: NodeData = nodeQuery.pop();
 
-        if (nodeData.parent) {
-            let newNode;
-            const keys = Object.keys(transforms);
-            for (const transformKey of keys) {
-                if (transformKey === nodeData.node.type) {
-                    newNode = transforms[transformKey](nodeData.node, nodeData.block, nodeData.functionBody, nodeData.parent);
-                    break;
+            if (nodeData.parent) {
+                let newNode;
+                const keys = Object.keys(transform);
+                for (const transformKey of keys) {
+                    if (transformKey === nodeData.node.type) {
+                        newNode = transform[transformKey](nodeData.node, nodeData.block, nodeData.functionBody, nodeData.parent);
+                        break;
+                    }
+                }
+                if (newNode) {
+                    nodeData.parent[nodeData.parentKey] = newNode;
                 }
             }
-            if (newNode) {
-                nodeData.parent[nodeData.parentKey] = newNode;
-            }
-        }
 
-        for (const key of Object.keys(nodeData.node)) {
-            const value = nodeData.node[key];
-            if (Array.isArray(value)) {
-                for (const index in value) {
-                    const childNode = value[index];
-                    if (isNode(childNode)) {
+            for (const key of Object.keys(nodeData.node)) {
+                const value = nodeData.node[key];
+                if (Array.isArray(value)) {
+                    for (const index in value) {
+                        const childNode = value[index];
+                        if (isNode(childNode)) {
 
-                        let block: BlockStatement = nodeData.block;
-                        let functionBody: BlockStatement = nodeData.functionBody;
+                            let block: BlockStatement = nodeData.block;
+                            let functionBody: BlockStatement = nodeData.functionBody;
 
-                        if (childNode.type === 'BlockStatement') {
-                            block = childNode;
+                            if (childNode.type === 'BlockStatement') {
+                                block = childNode;
 
-                            if(nodeData.node.type === 'FunctionDeclaration') {
-                                functionBody = childNode;
+                                if(nodeData.node.type === 'FunctionDeclaration') {
+                                    functionBody = childNode;
+                                }
                             }
+
+                            nodeQuery.push({ node: childNode, parent: value, parentKey: index, block, functionBody });
                         }
-
-                        nodeQuery.push({ node: childNode, parent: value, parentKey: index, block, functionBody });
                     }
-                }
-            } else if (isNode(value)) {
+                } else if (isNode(value)) {
 
-                let block: BlockStatement = nodeData.block;
-                let functionBody: BlockStatement = nodeData.functionBody;
+                    let block: BlockStatement = nodeData.block;
+                    let functionBody: BlockStatement = nodeData.functionBody;
 
-                if (value.type === 'BlockStatement') {
-                    block = value;
+                    if (value.type === 'BlockStatement') {
+                        block = value;
 
-                    if(nodeData.node.type === 'FunctionDeclaration') {
-                        functionBody = value;
+                        if(nodeData.node.type === 'FunctionDeclaration') {
+                            functionBody = value;
+                        }
                     }
+
+
+
+                    nodeQuery.push({ node: value, parent: nodeData.node, parentKey: key, block, functionBody });
                 }
-
-
-
-                nodeQuery.push({ node: value, parent: nodeData.node, parentKey: key, block, functionBody });
             }
         }
     }

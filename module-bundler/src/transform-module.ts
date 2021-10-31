@@ -5,13 +5,14 @@ import { hashPath, resolvePath } from "./path-utils";
 import fs from "fs";
 import { javascriptTransformer } from "./Javascript-transformer";
 import {
+	BlockStatement,
 	CallExpression, ClassExpression,
 	ExportAllDeclaration, ExportNamedDeclaration, Expression,
 	ExpressionStatement, FunctionExpression,
 	Identifier,
 	ImportDeclaration,
 	MemberExpression, SequenceExpression,
-	VariableDeclaration
+	VariableDeclaration, VariableDeclarator
 } from "estree";
 import {
 	createVariableDeclaration,
@@ -20,12 +21,31 @@ import {
 	createMemberExpression, createVoid0Expression, createSequenceExpression
 } from "./ast-helpers";
 
+interface VariableDeclarationData {
+	kind: 'var' | 'let' | 'const';
+	name: string;
+	functionBody: BlockStatement;
+	block: BlockStatement;
+	isExported: boolean;
+}
+
+function getDeclarationData(declaredIdentifiers: VariableDeclarationData[], name, block, funcBody): VariableDeclarationData {
+	return declaredIdentifiers.find(i => {
+		if (i.name !== name) {
+			return false;
+		}
+		const sameFunction = i.functionBody === funcBody;
+		const sameBlock = i.block === block;
+		const sameScope = (i.kind === "var") ? sameFunction : sameBlock;
+		return sameScope;
+	});
+}
+
 export function transformModule(modulePath: string, rootPath: string, requireFunction: string, exportsName: string): Module {
+	const code = fs.readFileSync(modulePath).toString();
 	const hash = hashPath(modulePath);
 	const importedPaths: string[] = [];
-	const exportedIdentifiers: {kind: 'var' | 'let' | 'const', name: string}[] = [];
-
-	const code = fs.readFileSync(modulePath).toString();
+	const declaredIdentifiers: VariableDeclarationData[] = [];
 
 	function transformImport(node: ImportDeclaration): VariableDeclaration | CallExpression {
 		const path = node.source.value as string;
@@ -76,7 +96,7 @@ export function transformModule(modulePath: string, rootPath: string, requireFun
 		importedPaths.push(absPath);
 	}
 
-	function transformNamedExport(node: ExportNamedDeclaration): ExpressionStatement | SequenceExpression {
+	function transformNamedExport(node: ExportNamedDeclaration, block: BlockStatement, func: BlockStatement): ExpressionStatement | SequenceExpression {
 		if (node.declaration?.type === 'VariableDeclaration') {
 			const kind = node.declaration.kind;
 			const expressionStatements: Expression[] = [];
@@ -84,7 +104,11 @@ export function transformModule(modulePath: string, rootPath: string, requireFun
 				const name = (declaration.id as Identifier).name;
 				const init = declaration.init ?? createVoid0Expression();
 
-				exportedIdentifiers.push({ kind, name });
+				const declarationData = getDeclarationData(declaredIdentifiers, name, block, func);
+
+				if (declarationData) {
+					declarationData.isExported = true;
+				}
 
 				expressionStatements.push(createAssigmentExpression(createMemberExpression(exportsName, name), init));
 			}
@@ -126,29 +150,44 @@ export function transformModule(modulePath: string, rootPath: string, requireFun
 		return node as unknown as ExpressionStatement;
 	}
 
-	function transformIdentifier(node: Identifier, _a, _b, parent): Identifier | MemberExpression {
-		// TODO: transform literals to exports.XXX within scope.
+	function transformIdentifier(node: Identifier, block: BlockStatement, funcBody: BlockStatement, parent): Identifier | MemberExpression {
 		if (parent.type === 'MemberExpression') {
 			return node;
 		}
-		const exportedIdentifier = exportedIdentifiers.find(i => i.name === node.name);
+		const identifier = getDeclarationData(declaredIdentifiers, node.name, block, funcBody);
 
-		if (exportedIdentifier) {
+		if (identifier && identifier.isExported) {
 			return createMemberExpression(exportsName, node.name);
 		}
 
 		return node;
 	}
 
-	let newCode = javascriptTransformer(code, {
-		'ImportDeclaration': transformImport,
-		'CallExpression': transformRequire,
-		'ExportNamedDeclaration': transformNamedExport
-	});
+	let newCode = javascriptTransformer(code, [
+		{
+			'VariableDeclaration': (node: VariableDeclaration, block, functionBody) => {
+				for (const declaration of node.declarations) {
+					declaredIdentifiers.push({
+						kind: node.kind,
+						name: (declaration.id as Identifier).name,
+						block: block,
+						functionBody: functionBody,
+						isExported: null
+					});
+				}
 
-	newCode = javascriptTransformer(newCode, {
-		'Identifier': transformIdentifier
-	});
+				return node;
+			}
+		},
+		{
+			'ImportDeclaration': transformImport,
+			'CallExpression': transformRequire,
+			'ExportNamedDeclaration': transformNamedExport
+		},
+		{
+			'Identifier': transformIdentifier
+		}
+	]);
 
 	return {
 		content: newCode,
