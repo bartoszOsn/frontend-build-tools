@@ -1,0 +1,64 @@
+[
+    {
+        "type": "script",
+        "value": "let rootClass = 'app-table';"
+    },
+    {
+        "type": "script",
+        "value": "function row(num, text) {"
+    },
+    {
+        "type": "element",
+        "tag": "tr",
+        "attributes": [],
+        "children": [
+            {
+                "type": "element",
+                "tag": "td",
+                "attributes": [],
+                "children": [
+                    {
+                        "type": "text",
+                        "text": "#"
+                    },
+                    {
+                        "type": "value",
+                        "identifier": "num"
+                    }
+                ]
+            },
+            {
+                "type": "element",
+                "tag": "td",
+                "attributes": [],
+                "children": [
+                    {
+                        "type": "text",
+                        "text": "Text: "
+                    },
+                    {
+                        "type": "value",
+                        "identifier": "text"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "type": "script",
+        "value": "}"
+    },
+    {
+        "type": "element",
+        "tag": "table",
+        "attributes": [
+            {"type": "variable", "name": "class", "identifier": "rootClass"}
+        ],
+        "children": [
+            {
+                "type": "script",
+                "value": "const texts = ['Ala', 'ma', 'kota', 'kot', 'ma', 'Alę']; for (let i = 0; i < 6; i++) { row(i + 1, texts[i]); }"
+            }
+        ]
+    }
+]
