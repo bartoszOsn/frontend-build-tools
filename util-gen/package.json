@@ -1,0 +1,19 @@
+{
+  "name": "snacksjs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@types/glob": "^7.2.0",
+    "@types/lodash": "^4.14.177",
+    "glob": "^7.2.0",
+    "jss": "^10.8.2",
+    "jss-preset-default": "^10.8.2",
+    "lodash": "^4.17.21",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
+  },
+  "scripts": {
+    "build:css": "ts-node buildCss.ts"
+  }
+}

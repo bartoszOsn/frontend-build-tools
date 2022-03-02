@@ -1,2 +1,5 @@
+# Project exclude paths
+/module-bundler/node_modules/
 node_modules
-coverage
+/module-bundler/coverage/
+.idea
