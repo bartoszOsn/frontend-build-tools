@@ -8,7 +8,7 @@ interface Predicate<T = defaultRuleType> {
 	(className: string): PredicateData<T> | false | null | undefined;
 }
 
-export type CSSRules = {}; // TODO
+export type CSSRules = Record<string, any>; // TODO
 
 export interface RuleEntry<T = defaultRuleType> {
 	match: RegExp | Predicate<T>;
