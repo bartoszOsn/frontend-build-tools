@@ -1,0 +1,118 @@
+\documentclass{SGGW-thesis}
+
+\INZYNIERSKAtrue
+\WZIMtrue
+
+\title{Analiza działania oraz odtworzenie narzędzi front--endowych}
+\Etitle{Analysis and reconstruction of front--end tools}
+\author{Bartosz Osiński}
+\date{2022}
+\album{196097}
+\thesis{Praca dyplomowa na kierunku:}
+\course{Informatyka}
+\promotor{dr.\ inż.\ Waldemara Karwowskiego, prof.\ SGGW}
+\pworkplace{Instytut Informatyki Technicznej\\Katedra Sztucznej Inteligencji} % TODO
+
+\usepackage{hyperref}
+
+\begin{document}
+\maketitle
+\statementpage
+\abstractpage % TODO napisać streszczenie i słowa kluczowe
+{Stworzenie klasy \LaTeX-owej do użytku przy pisaniu pracy dyplomowej w SGGW}
+{Tematem niniejszej pracy było zaimplementowanie klasy \LaTeX-owej pozwalającej na formatowanie tekstu zgodnie z wytycznymi nałożonymi przez uczelnię. Praca zawiera dwie
+główne części. Pierwsza z nich zawiera opis najważniejszych aspektów implementacji klasy. Natomiast druga część skupia się na sposobie użycia klasy przez osoby piszące prace
+dyplomowe.}
+{LaTeX, klasa, praca dyplomowa, implementacja, SGGW, Szkoła Główna Gospodarstwa Wiejskiego}
+{Creation of the \LaTeX\ Class to be Used When Writing a Thesis at the Warsaw University of Life Sciences -- SGGW}
+{The subject of this study was to implement a \LaTeX\ class that allows for text formatting according to the guidelines imposed by the University. The work consists of two
+main parts. The first one describes the most important aspects of the implementation. The second part focuses on how to use the class by people writing the theses.}
+{LaTeX, class, thesis, implementation, SGGW, Warsaw University of Life Sciences}
+
+
+{
+  % Spis treści może być złożony z pojedynczą interlinią, np. jeśli jedna linia wychodzi na następną stronę.
+  % W przeciwnym razie spis treści wstawić bez powyższego rozkazu i klamry.
+  \doublespacing
+  \tableofcontents
+}
+
+\startchapterfromoddpage % niezależnie od długości spisu treści pierwszy rozdział zacznie się na nieparzystej stronie
+
+
+\chapter{Wstęp}
+Współczesne aplikacje internetowe najczęściej składają się z dwóch części: front--endowej oraz back--endowej. Rozróżnienie między nimi polega na tym, gdzie kod jest wykonywany -- jeśli jest on wykonywany po stronie serwera, mówimy o back--endzie, natomiast jeśli obliczenia wykonywane są na komputerze użytkownika, jest to front--end.
+
+Programowanie front--endowe jest jedną z najszybciej rozwijających się dziedzin programowania. Technologie, które pięć lat temu były zdecydowanymi liderami na rynku dziś są uważane za przestarzałe. Tak szybka ewolucja technik developerskich połączona z potrzebą kompatybilności wstecznej aplikacji internetowych (Właściciele aplikacji chcą, aby działały one dla jak największej grupy klientów, a nie tylko dla tych, którzy posiadają najnowsze wersje przeglądarek) generuje problemy, które deweloperzy rozwiązują używając między innymi szerokiego zakresu narzędzi front--endowych.
+
+\section{Charakterystyka narzędzi front-endowych}
+Podstawową cechą narzędzi front--endowych -- być może jedyną cechą wspólną dla większości narzędzi -- jest sposób ich konfiguracji. Większość narzędzi jest dostosowana do uruchomienia na dwa sposoby:
+\begin{enumerate}
+    \item Poprzez \emph{Command Line Interface} -- CLI -- wykonując krótki skrypt w wierszu poleceń takim jak np. Bash
+    \item Jako kod, najczęściej w języku Javascript -- narzędzie dostarczane jest developerowi jako biblioteka programistyczna. Programista tworzy plik, który wywołuje funkcje z dostarczonej biblioteki z odpowiednimi argumentami. Następnie za każdym razem, kiedy chce uruchomić narzędzie musi uruchomić stworzony przez siebie plik, np. przy użyciu środowiska Node.js, jeśli kod jest napisany w języku javascript.
+\end{enumerate}
+Wiele narzędzi pozwala na uruchomienie ich przy użyciu obu tych metod: poprzez CLI w przypadkach, które nie wymagają skomplikowanej konfiguracji ani niestandardowych zachowań, oraz poprzez kod w bardziej skomplikowanych sytuacjach.
+
+Wiele narzędzi łączy obie te metody w taki sposób, że programista tworzy plik, np. javascript, który eksportuje obiekt definiujący konfigurację, a następnie w wierszu poleceń uruchamia narzędzie przekazując mu tylko jeden argument -- ścieżkę do wspomnianego wcześniej pliku.
+
+\section{Wybór typów narzędzi}
+Praca ta ma na celu przeanalizowanie działania dwóch typów narzędzi frontendowych:
+\begin{itemize}
+    \item Module bundler -- Narzędzie, które łączy kod aplikacji rozdzielony na wiele plików w jeden plik, w ten sposób zamieniając kod przyjazny deweloperowi na wydajny kod wspierający starsze przeglądarki, które nie pozwalały na nowoczesne metody importowania i eksportowania symboli w plikach javascript. Przykładami istniejących narzędzi tego typu są \emph{Webpack} oraz \emph{Parcel}
+    \item Generator CSS--owych klas atomicznych -- Narzędzie, które przeszukuje kod aplikacji, szukając w niej nazw klas, dla których mogą być zdefiniowane jakieś style CSS, a następnie generuje plik CSS z odpowiednimi stylami. Przykładem może być \emph{Tailwind\cite{Tailwind_jit}} działający w trybie \emph{Just in Time} oraz \emph{UnoCSS\cite{unocss}}
+\end{itemize}
+Oba te typy narzędzi posiadają swoich przedstawicieli, na których będzie można się skupić podczas analizowania sposobu ich działania.
+
+
+\chapter{Module bundler}
+\emph{Module budler} to -- jak wspomniano wyżej -- narzędzie służące do "sklejenia" kodu znajdującego się w wielu plikach w jeden duży plik. Służy to kilku celom:
+\begin{itemize}
+    \item Zmniejszenie ilości zapytań do serwera -- Duże, komercyjne aplikacje nierzadko składają się z setek lub tysięcy plików. Wdrożenie aplikacji rozdzielonej w taki sposób wiązało by się z wysyłaniem setek lub tysięcy zapytań z przeglądarki na serwer podczas każdorazowego odwiedzenia strony. Byłoby to duże obciążenie dla przeglądarki oraz ogromne obciążenie dla serwera.
+    \item Utrzymanie kompatybilności wstecznej -- 
+\end{itemize}
+
+\section{Sposoby bundlowania}
+\section{Transformacja kodu javascript przy użyciu parsera}
+\section{Zależności cykliczne}
+\section{Testowanie module bundlera}
+
+\chapter{Generator CSSowych klas atomicznych}
+\section{Czym są klasy atomiczne?}
+\section{Powody używania generatora klas atomicznych}
+\section{Sposób działania}
+
+\chapter{Przykładowa aplikacja stworzona przy użyciu zaprezentowanych narzędzi}
+
+\chapter{Podsumowanie i wnioski}
+
+
+\begin{thebibliography}{9}
+% \bibitem{wymagania}
+% \textit{Zarządzenie nr 34 Rektora Szkoły Głównej Gospodarstwa Wiejskiego w Warszawie z dnia 01 czerwca 2016 r.\ w~ sprawie wprowadzenia ,,Wytycznych dotyczących
+% przygotowywania prac dyplomowych w~Szkole Głównej Gospodarstwa Wiejskiego w Warszawie''}, Załączniki 1 i~2
+% \url{https://www.sggw.pl/dla-studentow/informacje-formalno-prawne/dokumenty-do-pobrania}
+% $\rightarrow$ Praca dyplomowa (dostęp: 04.01.2017)
+% \bibitem{latexclass}
+% \textit{\LaTeXe\ for class and package writers} \url{http://www.latex-project.org/help/documentation/} $\rightarrow$ LaTeX2e for class... (dostęp 04.01.2017)
+% \bibitem{latexcompanion}
+% Frank Mittelbach and Michel Goossens with Johannes Braams, David Carlisle and Chris Rowley,
+% \textit{The \LaTeX\ Companion}. Second Edition,
+% Addison-Wesley, 2004.
+% \bibitem{tds}
+% \textit{A Directory Structure for \TeX\ Files} \url{http://tug.org/tds/tds.html} (dostęp 11.01.2017)
+\bibitem{Tailwind_jit}
+\textit{Just-in-Time Mode -- Tailwind CSS}
+\url{https://v2.tailwindcss.com/docs/just-in-time-mode} (dostęp 28.02.2022)
+
+\bibitem{unocss}
+\textit{Repozytorium projektu UnoCSS w serwisie Github}
+\url{https://github.com/unocss/unocss} (dostęp 28.02.2022)
+
+\bibitem{Exploring_JS}
+Axel Rauschmayer, \textit{Exploring JS}
+
+\end{thebibliography}
+
+\beforelastpage
+
+\end{document}
