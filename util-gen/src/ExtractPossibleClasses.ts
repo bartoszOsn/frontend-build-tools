@@ -32,5 +32,5 @@ export function extractPossibleClasses(inputGlob: string | string[]): string[] {
 
 	return possibleClasses;
 
-	// return ['bg-green-100', 'text-blue-400', 'hover:text-blue-900']; // TODO
+	// return ['bg-green-100', 'text-blue-400', 'modifiers:text-blue-900']; // TODO
 }

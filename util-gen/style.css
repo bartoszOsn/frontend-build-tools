@@ -4,6 +4,9 @@
 .bg-green-600 {
   background-color: hsl(120, 50%, 60%);
 }
+.hover\:bg-green-800:hover {
+  background-color: hsl(120, 50%, 80%);
+}
 .text-green-600 {
   color: hsl(120, 50%, 60%);
 }
