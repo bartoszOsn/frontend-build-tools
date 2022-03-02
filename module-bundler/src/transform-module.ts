@@ -101,16 +101,20 @@ export function transformModule(modulePath: string, rootPath: string, requireFun
 			const kind = node.declaration.kind;
 			const expressionStatements: Expression[] = [];
 			for (const declaration of node.declaration.declarations) {
-				const name = (declaration.id as Identifier).name;
-				const init = declaration.init ?? createVoid0Expression();
+				if (declaration.id.type === 'Identifier') {
+					const name = (declaration.id as Identifier).name;
+					const init = declaration.init ?? createVoid0Expression();
 
-				const declarationData = getDeclarationData(declaredIdentifiers, name, block, func);
+					const declarationData = getDeclarationData(declaredIdentifiers, name, block, func);
 
-				if (declarationData) {
-					declarationData.isExported = true;
+					if (declarationData) {
+						declarationData.isExported = true;
+					}
+
+					expressionStatements.push(createAssigmentExpression(createMemberExpression(exportsName, name), init));
+				} else if (declaration.id.type === 'ObjectPattern') {
+
 				}
-
-				expressionStatements.push(createAssigmentExpression(createMemberExpression(exportsName, name), init));
 			}
 
 			if (expressionStatements.length === 1) {
@@ -145,6 +149,8 @@ export function transformModule(modulePath: string, rootPath: string, requireFun
 					} as ClassExpression
 				)
 			}
+		} else if (node.specifiers.length > 0) {
+
 		}
 
 		return node as unknown as ExpressionStatement;

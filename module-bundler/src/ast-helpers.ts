@@ -1,7 +1,7 @@
 import {
     AssignmentExpression,
     AssignmentProperty,
-    CallExpression, Expression,
+    CallExpression, Expression, ExpressionStatement,
     Identifier, Literal, MemberExpression,
     ObjectPattern, SequenceExpression, UnaryExpression, UnaryOperator,
     VariableDeclaration,
@@ -118,4 +118,49 @@ export function createSequenceExpression(expressions: Expression[]): SequenceExp
         type: "SequenceExpression",
         expressions: expressions
     };
+}
+
+export function createIIFWithTemp(init: Expression, propertyMap: {[key: string]: string}, exportsName: string): ExpressionStatement {
+    return {
+        type: "ExpressionStatement",
+        expression: {
+            type: "CallExpression",
+            arguments: [],
+            optional: false,
+            callee: {
+                type: 'FunctionExpression',
+                id: null,
+                generator: false,
+                async: false,
+                params: [],
+                body: {
+                    type: "BlockStatement",
+                    body: [
+                        {
+                            type: 'VariableDeclaration',
+                            kind: "var",
+                            declarations: [
+                                {
+                                    type: "VariableDeclarator",
+                                    id: createIdentifier('tmp'),
+                                    init: init
+                                }
+                            ]
+                        },
+                        {
+                            type: "ExpressionStatement",
+                            expression: createSequenceExpression(
+                                Object.entries(propertyMap).map(entry => {
+                                    return createAssigmentExpression(
+                                        createMemberExpression(exportsName, entry[1]),
+                                        createMemberExpression()
+                                    )
+                                })
+                            )
+                        }
+                    ]
+                }
+            }
+        }
+    }
 }
