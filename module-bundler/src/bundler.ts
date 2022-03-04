@@ -3,6 +3,7 @@ import { selectLoader } from "./loader-helpers";
 import { Module } from "./domain/module";
 import { render } from "ejs";
 import * as Path from "path";
+import fs from "fs";
 
 export interface BundleOptions {
 	entry: string;
@@ -18,7 +19,9 @@ export class Bundler {
 		const loader = selectLoader(options.entry, options.loaders);
 		const transformedModules = this.getTransformedModule(options.entry, loader);
 
-		const content = render(Path.resolve(__dirname, './template.ejs'), { randomHash: this.getRandomHash(), modules: transformedModules});
+		const template = fs.readFileSync(Path.resolve(__dirname, './template.ejs')).toString();
+
+		const content = render(template, { randomHash: this.getRandomHash(), modules: transformedModules});
 		return content;
 	}
 
@@ -34,11 +37,12 @@ export class Bundler {
 			const path = pathQuery.pop();
 			const module = loader.GetTransformedModule(path);
 			modules.push(module);
+			pathQuery.push(...module.importPaths);
 		}
 		return modules;
 	}
 
 	private getRandomHash(): string {
-		return (Math.random() * 100000).toString(16);
+		return Math.floor(Math.random() * 100000).toString(16);
 	}
 }
