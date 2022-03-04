@@ -22,3 +22,5 @@ module_SOMEHASH.exports.default = function area(radius) {
     return squareRadius(radius) * PI;
 }
 */
+
+export * from './bundler';

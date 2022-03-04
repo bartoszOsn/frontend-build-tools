@@ -17,9 +17,11 @@
 
 (() => {
     const moduleBundler_<%= randomHash %> = {};
-    moduleBundler_<%= randomHash %>.modules = {
+    __bundler$<%= randomHash %>.modules = {
         <% modules.forEach(module => { %>
-            "<%= module.hash %>"
+            "<%= module.hash %>": function(<% module.requireFunction %>, <% module.exportsName%>) {
+                <% module.content%>
+            },
         <% }) %>
     }
 })();
