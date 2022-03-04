@@ -120,47 +120,47 @@ export function createSequenceExpression(expressions: Expression[]): SequenceExp
     };
 }
 
-export function createIIFWithTemp(init: Expression, propertyMap: {[key: string]: string}, exportsName: string): ExpressionStatement {
-    return {
-        type: "ExpressionStatement",
-        expression: {
-            type: "CallExpression",
-            arguments: [],
-            optional: false,
-            callee: {
-                type: 'FunctionExpression',
-                id: null,
-                generator: false,
-                async: false,
-                params: [],
-                body: {
-                    type: "BlockStatement",
-                    body: [
-                        {
-                            type: 'VariableDeclaration',
-                            kind: "var",
-                            declarations: [
-                                {
-                                    type: "VariableDeclarator",
-                                    id: createIdentifier('tmp'),
-                                    init: init
-                                }
-                            ]
-                        },
-                        {
-                            type: "ExpressionStatement",
-                            expression: createSequenceExpression(
-                                Object.entries(propertyMap).map(entry => {
-                                    return createAssigmentExpression(
-                                        createMemberExpression(exportsName, entry[1]),
-                                        createMemberExpression()
-                                    )
-                                })
-                            )
-                        }
-                    ]
-                }
-            }
-        }
-    }
-}
+// export function createIIFWithTemp(init: Expression, propertyMap: {[key: string]: string}, exportsName: string): ExpressionStatement {
+//     return {
+//         type: "ExpressionStatement",
+//         expression: {
+//             type: "CallExpression",
+//             arguments: [],
+//             optional: false,
+//             callee: {
+//                 type: 'FunctionExpression',
+//                 id: null,
+//                 generator: false,
+//                 async: false,
+//                 params: [],
+//                 body: {
+//                     type: "BlockStatement",
+//                     body: [
+//                         {
+//                             type: 'VariableDeclaration',
+//                             kind: "var",
+//                             declarations: [
+//                                 {
+//                                     type: "VariableDeclarator",
+//                                     id: createIdentifier('tmp'),
+//                                     init: init
+//                                 }
+//                             ]
+//                         },
+//                         {
+//                             type: "ExpressionStatement",
+//                             expression: createSequenceExpression(
+//                                 Object.entries(propertyMap).map(entry => {
+//                                     return createAssigmentExpression(
+//                                         createMemberExpression(exportsName, entry[1]),
+//                                         createMemberExpression()
+//                                     )
+//                                 })
+//                             )
+//                         }
+//                     ]
+//                 }
+//             }
+//         }
+//     }
+// }

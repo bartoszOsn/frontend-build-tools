@@ -5,21 +5,21 @@ import {ImportDeclaration, Identifier, VariableDeclaration, ImportSpecifier, Blo
 describe('javascriptTransformer()', () => {
     test('basic', () => {
         const code = 'const a = fn(2 + 2);';
-        const newCode = javascriptTransformer(code, { 'Identifier': (node: Identifier) => {
+        const newCode = javascriptTransformer(code, [{ 'Identifier': (node: Identifier) => {
             if (node.name !== 'fn') {
                 return node;
             }
             const newNode = {...node};
             newNode.name = 'b';
             return newNode;
-        }});
+        }}]);
 
         expect(newCode).toMatch('const a = b(2 + 2);');
     });
 
     test('import into function', () => {
         const code = 'import { fn } from \'@fn\';fn();';
-        const newCode = javascriptTransformer(code, { 'ImportDeclaration': (node: ImportDeclaration) => {
+        const newCode = javascriptTransformer(code, [{ 'ImportDeclaration': (node: ImportDeclaration) => {
                 const result: VariableDeclaration = {
                     type: "VariableDeclaration",
                     declarations: [
@@ -49,7 +49,7 @@ describe('javascriptTransformer()', () => {
                     "kind": "const"
                 }
                 return result;
-            }});
+            }}]);
 
         expect(newCode).toMatch('const fn = require(\'module_@fn\');\nfn();');
     });
@@ -63,7 +63,7 @@ describe('javascriptTransformer()', () => {
             }
         `;
 
-        javascriptTransformer(code, {
+        javascriptTransformer(code, [{
             'Identifier': (node: Identifier, block: any, functionBody: BlockStatement) => {
                 if(node.name === 'b') {
                     expect(block).toBeDefined();
@@ -72,7 +72,7 @@ describe('javascriptTransformer()', () => {
 
                 return node;
             }
-        });
+        }]);
 
         expect.hasAssertions();
     });
@@ -85,7 +85,7 @@ describe('javascriptTransformer()', () => {
             }
         `;
 
-        javascriptTransformer(code, {
+        javascriptTransformer(code, [{
             'Identifier': (node: Identifier, block: any, functionBody: any) => {
                 if(node.name === 'fn') {
                     expect(functionBody).toBeNull();
@@ -97,7 +97,7 @@ describe('javascriptTransformer()', () => {
 
                 return node;
             }
-        });
+        }]);
 
         expect.hasAssertions();
     });

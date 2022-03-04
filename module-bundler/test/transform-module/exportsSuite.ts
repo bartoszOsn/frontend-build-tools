@@ -30,7 +30,7 @@ export function exportsSuite() {
 
 	testExport('let a,b;export {a, b}', 'exports.a = a, exports.b = b;');
 
-	testExport('export {a as aliasA, b as aliasB}', 'exports.aliasA = a, exports.aliasB = b;');
+	testExport('let a,b;export {a as aliasA, b as aliasB}', 'exports.aliasA = a, exports.aliasB = b;');
 
 	testExport('export const { a, b: c } = o;', 'exports.a = o.a, exports.b = o.c');
 
