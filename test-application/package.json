@@ -17,5 +17,9 @@
     "serve": "serve dist",
     "watch": "nodemon --watch src --exec yarn build",
     "start": "concurrently 'yarn:serve' 'yarn:watch'"
+  },
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   }
 }
