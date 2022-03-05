@@ -42,8 +42,13 @@ function getDeclarationData(declaredIdentifiers: VariableDeclarationData[], name
 	});
 }
 
-export function transformModule(modulePath: string, rootPath: string, requireFunction: string, exportsName: string, moduleExportsName: string): Module {
-	const code = fs.readFileSync(modulePath).toString();
+export function transformModule(modulePath: string,
+								rootPath: string,
+								requireFunction: string,
+								exportsName: string,
+								moduleExportsName: string,
+								contentTransform: (content: string) => string = (c) => c): Module {
+	const code = contentTransform(fs.readFileSync(modulePath).toString());
 	const hash = hashPath(modulePath);
 	const importedPaths: string[] = [];
 	const declaredIdentifiers: VariableDeclarationData[] = [];

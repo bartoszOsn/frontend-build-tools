@@ -22,6 +22,7 @@
     "acorn": "^8.5.0",
     "ejs": "^3.1.6",
     "escodegen": "^2.0.0",
+    "jsx-transform-modern": "^1.0.3",
     "minimatch": "^3.0.4",
     "mock-fs": "^5.1.1"
   }

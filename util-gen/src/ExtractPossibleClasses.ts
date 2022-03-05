@@ -8,13 +8,14 @@ function getFileNames(globs: string | string[]): string[] {
 
 	let filenames: string[] = [];
 	for(const pathGlob of globs) {
-		filenames = [...filenames, ...glob.sync(pathGlob)];
+		filenames = [...filenames, ...glob.sync(pathGlob, {nodir: true})];
 	}
 
 	return filenames;
 }
 
 function getPossibleClasses(filename: string): string[] {
+	console.log(filename);
 	const content = fs.readFileSync(filename).toString();
 
 	return content.split(/[\s'"]/).filter(str => str.length > 0);

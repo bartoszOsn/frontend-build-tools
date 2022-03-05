@@ -16,8 +16,7 @@ export interface BundleOutputOptions extends BundleOptions {
 
 export class Bundler {
 	getOutputModuleContent(options: BundleOptions): string {
-		const loader = selectLoader(options.entry, options.loaders);
-		const transformedModules = this.getTransformedModule(options.entry, loader);
+		const transformedModules = this.getTransformedModule(options.entry, options.loaders);
 
 		const template = fs.readFileSync(Path.resolve(__dirname, './template.ejs')).toString();
 
@@ -32,12 +31,13 @@ export class Bundler {
 		fs.writeFileSync(options.output, content);
 	}
 
-	private getTransformedModule(entryPath: string, loader: Loader): Module[] {
+	private getTransformedModule(entryPath: string, loaders: Loader[]): Module[] {
 		const modules: Module[] = [];
 		const pathQuery: string[] = [entryPath];
 
 		while (pathQuery.length > 0) {
 			const path = pathQuery.pop();
+			const loader = selectLoader(path, loaders);
 			const module = loader.GetTransformedModule(path);
 			modules.push(module);
 			pathQuery.push(...module.importPaths);
