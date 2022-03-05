@@ -2,6 +2,7 @@ import path from "path";
 import fs from 'fs';
 import crypto from "crypto";
 import { PathAliases } from "./domain/path-aliases";
+import * as Path from "path";
 
 export function isPathRelative(analyzedPath: string): boolean {
     return ['.', '..'].some(str => analyzedPath === str || analyzedPath.startsWith(str + path.sep));
@@ -115,5 +116,9 @@ function resolvePathInternal(modulePath: string, currentModulePath: string, root
 }
 
 export function resolvePath(modulePath: string, currentModulePath: string, rootPath: string, pathAliases: PathAliases, dependencyModulePaths: string[]): string {
-    return resolveToExactFile(resolvePathInternal(modulePath, currentModulePath, rootPath, pathAliases, dependencyModulePaths));
+    const dirname = Path.dirname(currentModulePath);
+    console.log('Module Path: ', modulePath, currentModulePath);
+    const relativePath = require.resolve(modulePath, { paths: [dirname]});
+    return Path.resolve(dirname, relativePath);
+    // return resolveToExactFile(resolvePathInternal(modulePath, currentModulePath, rootPath, pathAliases, dependencyModulePaths));
 }

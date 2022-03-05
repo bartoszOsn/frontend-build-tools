@@ -86,10 +86,10 @@ export function transformModule(modulePath: string, rootPath: string, requireFun
 			return node;
 		}
 
-		if (node.callee.name === 'require') {
-			node.callee.name = requireFunction;
+		if (node.callee.name !== 'require') {
+			return node;
 		}
-
+		node.callee.name = requireFunction;
 
 		// TODO do funkcji to
 		const absPath = resolvePath(node.arguments[0].value.toString(), modulePath, rootPath, {}, [] /* TODO */);
