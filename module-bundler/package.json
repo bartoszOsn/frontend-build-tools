@@ -16,9 +16,11 @@
   },
   "dependencies": {
     "@types/acorn": "^4.0.6",
+    "@types/ejs": "^3.1.0",
     "@types/estree": "^0.0.50",
     "@types/minimatch": "^3.0.5",
     "acorn": "^8.5.0",
+    "ejs": "^3.1.6",
     "escodegen": "^2.0.0",
     "minimatch": "^3.0.4",
     "mock-fs": "^5.1.1"

@@ -1,0 +1,21 @@
+{
+  "name": "test-application",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^7.0.0",
+    "nodemon": "^2.0.15",
+    "serve": "^13.0.2",
+    "ts-node": "^10.6.0"
+  },
+  "scripts": {
+    "ts-node": "ts-node",
+    "build:js": "ts-node --compilerOptions \"{\\\"strict\\\": false}\" config/bundle.ts",
+    "build:css": "ts-node config/generate-utils.ts",
+    "build": "concurrently 'yarn:build:js' 'yarn:build:css'",
+    "serve": "serve dist",
+    "watch": "nodemon --watch src --exec yarn build",
+    "start": "concurrently 'yarn:serve' 'yarn:watch'"
+  }
+}

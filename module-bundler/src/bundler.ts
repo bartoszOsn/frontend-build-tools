@@ -26,7 +26,10 @@ export class Bundler {
 	}
 
 	bundle(options: BundleOutputOptions) {
-
+		const content = this.getOutputModuleContent(options);
+		const dirName = Path.dirname(options.output);
+		fs.mkdirSync(dirName, { recursive: true });
+		fs.writeFileSync(options.output, content);
 	}
 
 	private getTransformedModule(entryPath: string, loader: Loader): Module[] {
