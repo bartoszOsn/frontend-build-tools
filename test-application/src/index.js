@@ -5,4 +5,7 @@ function App() {
 	return React.createElement('h1', null, 'Hello!');
 }
 
-ReactDom.render(React.createElement(App, null, null), document.querySelector('#app'));
+document.addEventListener('DOMContentLoaded', () => {
+	ReactDom.render(React.createElement(App, null, null), document.querySelector('#app'));
+});
+

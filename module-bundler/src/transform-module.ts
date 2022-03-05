@@ -20,6 +20,7 @@ import {
 	createAssigmentExpression,
 	createMemberExpression, createVoid0Expression, createSequenceExpression
 } from "./ast-helpers";
+import * as module from "module";
 
 interface VariableDeclarationData {
 	kind: 'var' | 'let' | 'const';
@@ -41,7 +42,7 @@ function getDeclarationData(declaredIdentifiers: VariableDeclarationData[], name
 	});
 }
 
-export function transformModule(modulePath: string, rootPath: string, requireFunction: string, exportsName: string): Module {
+export function transformModule(modulePath: string, rootPath: string, requireFunction: string, exportsName: string, moduleExportsName: string): Module {
 	const code = fs.readFileSync(modulePath).toString();
 	const hash = hashPath(modulePath);
 	const importedPaths: string[] = [];
@@ -90,10 +91,27 @@ export function transformModule(modulePath: string, rootPath: string, requireFun
 			return node;
 		}
 		node.callee.name = requireFunction;
+		const requiredModulePath = node.arguments[0].value.toString();
+		const absPath = resolvePath(requiredModulePath, modulePath, rootPath, {}, [] /* TODO */);
+		node.arguments[0].value = hashPath(absPath);
+		node.arguments[0].raw = JSON.stringify(node.arguments[0].value);
 
-		// TODO do funkcji to
-		const absPath = resolvePath(node.arguments[0].value.toString(), modulePath, rootPath, {}, [] /* TODO */);
 		importedPaths.push(absPath);
+	}
+
+	function transformModuleExports(node: MemberExpression): MemberExpression {
+		if (node.object.type !== 'Identifier' || node.property.type !== 'Identifier') {
+			return node;
+		}
+
+		if (node.object.name === 'exports') {
+			node.object.name = exportsName;
+		} else if (node.object.name === 'module' && (node.property as unknown as Identifier).name === 'exports') {
+			node.object.name = moduleExportsName;
+			(node.property as unknown as Identifier).name = exportsName;
+		}
+
+		return node;
 	}
 
 	function transformNamedExport(node: ExportNamedDeclaration, block: BlockStatement, func: BlockStatement): ExpressionStatement | SequenceExpression {
@@ -188,6 +206,7 @@ export function transformModule(modulePath: string, rootPath: string, requireFun
 		{
 			'ImportDeclaration': transformImport,
 			'CallExpression': transformRequire,
+			'MemberExpression': transformModuleExports,
 			'ExportNamedDeclaration': transformNamedExport
 		},
 		{
@@ -201,6 +220,7 @@ export function transformModule(modulePath: string, rootPath: string, requireFun
 		hash: hash,
 		exportsName: exportsName,
 		requireFunction: requireFunction,
+		moduleExportsName: moduleExportsName,
 		importPaths: importedPaths
 	};
 }

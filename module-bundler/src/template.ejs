@@ -16,10 +16,17 @@
 %>
 
 (() => {
+
+    const process = {
+        env: {
+            NODE_ENV: 'development'
+        }
+    };
+
     const __bundler$<%- randomHash %> = {};
     __bundler$<%- randomHash %>.modules = {
         <% modules.forEach(module => { %>
-            "<%- module.hash %>": function(<%- module.requireFunction %>, <%- module.exportsName%>) {
+            "<%- module.hash %>": function(<%- module.requireFunction %>, <%- module.exportsName%>, <%- module.moduleExportsName %>) {
                 <%- module.content%>
             },
         <% }) %>
@@ -28,9 +35,12 @@
 
     __bundler$<%- randomHash %>.requireFunction = function(hash) {
         if (__bundler$<%- randomHash %>.cached[hash] === undefined) {
-            const module = {};
-            __bundler$<%- randomHash %>.modules[hash](__bundler$<%- randomHash %>.requireFunction, module);
-            __bundler$<%- randomHash %>.cached[hash] = module
+            const exports = {};
+            const module = {
+                <%- modules[0].exportsName %>: exports
+            };
+            __bundler$<%- randomHash %>.modules[hash](__bundler$<%- randomHash %>.requireFunction, exports, module);
+            __bundler$<%- randomHash %>.cached[hash] = module.<%- modules[0].exportsName %>
         }
 
         return __bundler$<%- randomHash %>.cached[hash];

@@ -6,7 +6,7 @@ export class JavascriptLoader extends Loader {
 	public pattern = /\.jsm?/;
 
 	GetTransformedModule(path: string): Module {
-		return transformModule(path, path, '__bundler$require', '__bundler$exports');
+		return transformModule(path, path, '__bundler$require', '__bundler$exports', '__bundler$module');
 	}
 
 }

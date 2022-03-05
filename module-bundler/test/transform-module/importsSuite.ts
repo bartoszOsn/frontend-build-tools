@@ -10,7 +10,7 @@ function testImport(oldCode: string, expectedCode: string) {
 			}
 		});
 
-		const module = transformModule('/root/index.js', '', 'require', 'exports');
+		const module = transformModule('/root/index.js', '', 'require', 'exports', 'module');
 		expect(module.content).toMatch(expectedCode);
 
 		restoreFs();
