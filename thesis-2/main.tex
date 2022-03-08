@@ -1,4 +1,4 @@
-\documentclass{SGGW-thesis}
+ \documentclass{SGGW-thesis}
 
 \INZYNIERSKAtrue
 \WZIMtrue
@@ -59,7 +59,7 @@ Wiele narzędzi łączy obie te metody w taki sposób, że programista tworzy pl
 Praca ta ma na celu przeanalizowanie działania dwóch typów narzędzi frontendowych:
 \begin{itemize}
     \item Module bundler -- Narzędzie, które łączy kod aplikacji rozdzielony na wiele plików w jeden plik, w ten sposób zamieniając kod przyjazny deweloperowi na wydajny kod wspierający starsze przeglądarki, które nie pozwalały na nowoczesne metody importowania i eksportowania symboli w plikach javascript. Przykładami istniejących narzędzi tego typu są \emph{Webpack} oraz \emph{Parcel}
-    \item Generator CSS--owych klas atomicznych -- Narzędzie, które przeszukuje kod aplikacji, szukając w niej nazw klas, dla których mogą być zdefiniowane jakieś style CSS, a następnie generuje plik CSS z odpowiednimi stylami. Przykładem może być \emph{Tailwind\cite{Tailwind_jit}} działający w trybie \emph{Just in Time} oraz \emph{UnoCSS\cite{unocss}}
+    \item Generator CSS--owych klas atomicznych -- Narzędzie, które przeszukuje kod aplikacji, szukając w niej nazw klas, dla których mogą być zdefiniowane pewne style CSS, a następnie generuje plik CSS z odpowiednimi stylami. Przykładem może być \emph{Tailwind\cite{Tailwind_jit}} działający w trybie \emph{Just in Time} oraz \emph{UnoCSS\cite{unocss}}
 \end{itemize}
 Oba te typy narzędzi posiadają swoich przedstawicieli, na których będzie można się skupić podczas analizowania sposobu ich działania.
 
@@ -68,10 +68,19 @@ Oba te typy narzędzi posiadają swoich przedstawicieli, na których będzie mo�
 \emph{Module budler} to -- jak wspomniano wyżej -- narzędzie służące do "sklejenia" kodu znajdującego się w wielu plikach w jeden duży plik. Służy to kilku celom:
 \begin{itemize}
     \item Zmniejszenie ilości zapytań do serwera -- Duże, komercyjne aplikacje nierzadko składają się z setek lub tysięcy plików. Wdrożenie aplikacji rozdzielonej w taki sposób wiązało by się z wysyłaniem setek lub tysięcy zapytań z przeglądarki na serwer podczas każdorazowego odwiedzenia strony. Byłoby to duże obciążenie dla przeglądarki oraz ogromne obciążenie dla serwera.
-    \item Utrzymanie kompatybilności wstecznej -- 
+    \item Utrzymanie kompatybilności wstecznej -- Specyfikacja javascript pozwala na importowanie oraz eksportowanie symboli z oraz do plików, jednak zostało to zaimplementowane w najpopularniejszych przeglądarkach stosunkowo niedawno -- pierwsze wersje Google Chrome, Opery oraz Safari wspierające javascriptowe moduły zostały wydane w 2017 roku. Rok później dołączyły do nich Mozilla Firefox oraz Microsoft Edge.\cite{es6_modules_support}
 \end{itemize}
 
+Istnieje kilka formatów modułów javascript. Najpopularniejsze z nich to UMD, CommonJS oraz format opisany w specyfikacji ES6, przy czym UMD jest w ostatnich latach coraz rzadziej używany.\cite{es6_for_humans}
+
+Module bundler stworzony przeze mnie wspiera zarówno CommonJS jak i ES6. Format opisany w specyfikacji ES6 staje się coraz bardziej popularny, i możemy przewidywać, że w przyszłości wyprze format CommonJS, na co może wskazywać chociażby to, że obecnie został on zaimplementowany tak w przeglądarkach, jak i w środowisku Node.js, które wcześniej wspierało tylko CommonJS\cite{nodejs_modules}. Z tego powodu mój module bundler skupia się na ES6, jednak nie można było pominąć formatu CommonJS -- Używa go ogromna część najpopularniejszych bibliotek javascriptowych, w tym np. React. Aby kod tych bibliotek został poprawnie zaimportowany w aplikacji module bundler musi wspierać format, w jakim jest stworzona biblioteka.
+
+
 \section{Sposoby bundlowania}
+% https://parceljs.org/features/scope-hoisting/
+Większość module bundlerów używa jednego z dwóch sposobów na bundlowanie modułów: Korzystająć z IIFE lub używając techniki zwanej Scope Hoisting, z czego ta druga z nich jest zdecydowanie częściej używana\cite{parcel_scope_hoisting}.
+
+
 \section{Transformacja kodu javascript przy użyciu parsera}
 \section{Zależności cykliczne}
 \section{Testowanie module bundlera}
@@ -110,6 +119,21 @@ Oba te typy narzędzi posiadają swoich przedstawicieli, na których będzie mo�
 
 \bibitem{Exploring_JS}
 Axel Rauschmayer, \textit{Exploring JS}
+
+\bibitem{es6_modules_support}
+\textit{JavaScript modules -- JavaScript | MDN}
+\url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#browser_support} (dostęp 15.03.2022)
+
+\bibitem{es6_for_humans}
+Grover D., Kunduru H.P. (2017) ES6 for Humans. Apress, Berkeley, CA.
+
+\bibitem{nodejs_modules}
+\textit{Modules: ECMAScript modules -- Node.js v17.7.1 documentation}
+\url{https://nodejs.org/api/esm.html} (dostęp 15.03.2022)
+
+\bibitem{parcel_scope_hoisting}
+\textit{Scope hoisting -- Parcel.js documentation}
+\url{https://parceljs.org/features/scope-hoisting/} (dostęp 15.03.2022)
 
 \end{thebibliography}
 
