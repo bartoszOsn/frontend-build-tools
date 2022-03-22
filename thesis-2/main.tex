@@ -80,6 +80,48 @@ Module bundler stworzony przeze mnie wspiera zarówno CommonJS jak i ES6. Format
 % https://parceljs.org/features/scope-hoisting/
 Większość module bundlerów używa jednego z dwóch sposobów na bundlowanie modułów: Korzystająć z IIFE lub używając techniki zwanej Scope Hoisting, z czego ta druga z nich jest zdecydowanie częściej używana\cite{parcel_scope_hoisting}.
 
+Scope hoisting polega na "wrzuceniu" zawartości każdego modułu do jednego pliku, jednocześnie zmieniając nazwy wszystkich symboli w tym module, takich jak klasy, zmienne, stałe lub metody. Każda z takich nazw staje się unikalna dla modułu, tak, aby symbole o takiej samej nazwie pochodzące z różnych modułów w pliku wyjściowym miały inną nazwę.
+
+Oto przykład demonstrujący scope hoisting. Na wejściu mamy dwa pliki, "math.js" oraz "index.js".
+
+math.js:
+\begin{verbatim}
+export function add(a, b) {
+  return a + b;
+}
+
+export function square(a) {
+  return a * a;
+}
+\end{verbatim}
+
+index.js:
+\begin{verbatim}
+import {add, square} from './math';
+
+console.log(add(2, 3));
+console.log(square(5));
+\end{verbatim}
+
+Kod taki zbundlowany przy pomocy metody scope hoisting mógłby wyglądać na przykład tak:
+
+\begin{verbatim}
+function $fa6943ce8a6b29$add(a, b) {
+  return a + b;
+}
+
+function $fa6943ce8a6b29$square(a) {
+  return a * a;
+}
+
+console.log($fa6943ce8a6b29$add(2, 3));
+console.log($fa6943ce8a6b29$square(5));
+\end{verbatim}
+
+Druga najczęściej używana metoda polega na reprezentacji każdego modułu jako funkcji. W momencie, kiedy jeden moduł importuje pewne symbole z innego modułu, metoda reprezentująca zaimportowany moduł jest wykonywana. Następnie zwrócone wyniki zostają dostarczone do modułu importującego, a także zapisane w cache. Kiedy koejny moduł zaimportuje coś z tego samego modułu, funkcja nie wykona się kolejny raz. Zamiast tego, moduł dostanie wyniki z cache. Jest to istotne, ponieważ w specyfikacji Javascript moduły są singletonami. Oznacza to, że kiedy dwa moduły zaimportują te same symbole z innego modułu, oba dostaną te same symbole, a nie identyczne kopie. Jeśli więc jeden z tych kodułów w jakiś sposób zmieni coś w jednym z zaimportowanych symboli, będzie to także miało effekt w drugim module, który zaimportował ten symbol.
+
+Ja w swoim module bundlerze zdecydowałem się skorzystać z drugiej metody.
+
 
 \section{Transformacja kodu javascript przy użyciu parsera}
 \section{Zależności cykliczne}
