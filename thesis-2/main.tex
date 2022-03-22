@@ -128,7 +128,18 @@ Ja w swoim module bundlerze zdecydowałem się skorzystać z drugiej metody.
 \section{Testowanie module bundlera}
 
 \chapter{Generator CSSowych klas atomicznych}
+Tradycyjne podejście do pisania kodu CSS polega wybieraniu konkretnych elementów html a następnie nadawaniu im serii reguł. Na przykład, mając na stronie okno dialogowe posiadające klasę ".dialog" w pliku CSS określili byśmy, że każdy element posiadający klasę ".dialog" musi być ponad wszystkimi innymi elementami, musi być wyśrodkowany na stronie, musi mieć białe tło oraz ciemny cień.
+
+Problemy z takim podejściem pojawiają się, kiedy chcemy nadać style bardziej specyficznym stylom. Kontynuując poprzedni przykład, załóżmy, że w naszym oknie dialogowym posiadamy przycisk, wewnątrz którego znajduje się element <img> wyświetlający kółko sugerujące że ma miejsce jakaś akcja i przed naciśnięciem przycisku należy poczekać na jej zakończenie. Zazwyczaj takie ikony koła, zwane loaderami obracają się wokół własnej osi. Taki ruch najłatwiej wymusić poprzez style CSS. Aby jednak nadać jakieś reguły temu elementowi, musimy napisać selektor, który mówi o tym, że chcemy wybrać element <img>, który znajduje się wewnątrz elementu <button>, który znajduje się wewnątrz elementu posiadającego klasę ".dialog".
+
+Takie podejście ma swoje wady, jednym z nich jest potrzeba odzwierciedlenia struktury html wewnątrz pliku css, co jest żmudne oraz niepewne, biorąc pod uwagę, że struktura może się w pewnym momencie zmienić.
+
+Alternatywnym podejściem, wolnym od tych problemów jest użycie klas atomicznych.
+
+
 \section{Czym są klasy atomiczne?}
+
+
 \section{Powody używania generatora klas atomicznych}
 \section{Sposób działania}
 
