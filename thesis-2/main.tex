@@ -138,10 +138,28 @@ Alternatywnym podejściem, wolnym od tych problemów jest użycie klas atomiczny
 
 
 \section{Czym są klasy atomiczne?}
+Klasy atomiczne to CSSowe klasy, które mają do siebie przyporządkowaną tylko jedną regułę CSS. Klasa ".dialog" opisywana wyżej nie jest klasą atomiczną, jednak można ją zastąpić kilkoma innymi klasami atomicznymi:
+\begin{itemize}
+    \item klasa z regułą określającą, że element z tą klasą musi być wyświetlany ponad wszystkimi innymi, np. ".z-10000" i odpowiadająca jej reguła "z-index: 10000"
+    \item kilka klas z regułami powalającymi wycentrować element, np. "display: flex" oraz "align-items: center"
+    \item klasa z regułą odpowiadająca kolorowi tła, np. ".bg-white" i reguła: "background-color: white"
+    \item klasa z regułą definującą cień
+\end{itemize}
+
+Chcąc sprawić, aby nasz loader się obracał, wystarczyłoby nadać mu osdowiednią klasę atomiczną, np. ".spin". W ten sposób nie polegalibyśmy już na strukturze HTML, tak, jak robiliśmy to w poprzednim podejściu.
 
 
 \section{Powody używania generatora klas atomicznych}
+Co łatwo zauważyć, podejście takie wymaga napisania dużej ilości klas CSSowych, co jest żmudnym zajęciem. W przeszłości z tym problemem radzono sobie używając zewnętrznych bibliotek. W ten sposób w przeszłości działał np. tailwind - dostarczał on zbiór bardzo wielu klas atomicznych, których następnie developer używał do nadawania stylów elementom HTMLowym. W ramach jednego projektu używano jednak najczęściej tylko niewielką część wszystkich dostarczonych klas. Cała reszta była niepotrzebna, a jednak dalej znajdowała się w pliku, zwiększając jego rozmiar, jednocześnie opóźniając pełne załadowanie stylów w przeglądarce.
+
+Wiązał się z tym także kolejny problem - jakkolwiek zestaw klas był bardzo bogaty, dalej nie pokrywał on wszystkich możliwych potrzeb -- na przykład nie można stworzyć takiej ilości klas, które pozwalały by na nadanie dowolnego możliwego koloru tła.
+
+Sposobem na poradzenie sobie z tymi problemami jest generowanie klas na etapie budowania projektu -- nie można przewidzieć wszystkich potrzebnych developerowi klas, ale można sprawdzić, jakich klas użył, a następnie wygenerować je razem z odpowiadającymi im regułami.
+
+
 \section{Sposób działania}
+
+% \section{Stworzone reguły generowania klas} % TODO jeśli będzie zbyt mało tekstu i trzeba będzie coś dopisać
 
 \chapter{Przykładowa aplikacja stworzona przy użyciu zaprezentowanych narzędzi}
 
