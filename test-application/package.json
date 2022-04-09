@@ -15,7 +15,7 @@
     "build:css": "ts-node config/generate-utils.ts",
     "build": "concurrently 'yarn:build:js' 'yarn:build:css'",
     "serve": "serve dist",
-    "watch": "nodemon --watch src --exec yarn build",
+    "watch": "nodemon --watch src -e js,jsx,html --exec yarn build",
     "start": "concurrently 'yarn:serve' 'yarn:watch'"
   },
   "dependencies": {

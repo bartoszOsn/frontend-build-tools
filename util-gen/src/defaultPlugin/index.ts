@@ -4,6 +4,10 @@ import { textColor } from "./rules/textColor";
 import { modifiers } from "./modifiers/modifiers";
 import { margin, padding } from "./rules/spacing";
 import { sizing } from "./rules/sizing";
+import { display } from "./rules/display";
+import { alignItems } from "./rules/align-items";
+import { justifyContent } from "./rules/justifyContent";
+import { textDecoration } from "./rules/textDecoration";
 
 export const defaultPlugin: SnacksPlugin = {
 	rules: [
@@ -11,7 +15,11 @@ export const defaultPlugin: SnacksPlugin = {
 		textColor,
 		margin,
 		padding,
-		...sizing
+		...sizing,
+		...display,
+		...alignItems,
+		...justifyContent,
+		...textDecoration
 	],
 	modifiers: modifiers
 };

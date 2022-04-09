@@ -92,7 +92,7 @@ for (const prop of props) {
 		...sizing,
 		...sizingRemFactory(prop.prefix, prop.cssRule),
 		...sizingPercentageFactory(prop.prefix, prop.cssRule),
-		...sizingKeywordFactory(prop.prefix, prop.cssRule, 'full', '100%'),
+		...sizingKeywordFactory(prop.prefix, prop.cssRule, 'full', '100vh'),
 		...sizingKeywordFactory(prop.prefix, prop.cssRule, 'min', 'min-content'),
 		...sizingKeywordFactory(prop.prefix, prop.cssRule, 'max', 'max-content'),
 		...sizingKeywordFactory(prop.prefix, prop.cssRule, 'fit', 'fit-content'),

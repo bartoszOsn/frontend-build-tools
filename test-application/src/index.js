@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as ReactDom from 'react-dom'
-import { App } from "./components/App.jsx";
+import { AppComponent } from "./components/AppComponent.jsx";
 
 document.addEventListener('DOMContentLoaded', () => {
-	ReactDom.render(React.createElement(App, null, null), document.querySelector('#app'));
+	ReactDom.render(React.createElement(AppComponent, null, null), document.querySelector('#app'));
 });
 

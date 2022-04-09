@@ -4,10 +4,13 @@ const numberRegex = '(?<num>\\d*.?\\d*)';
 
 type SpacingDirection = '' | 'x' | 'y' | 't' | 'r' | 'b' | 'l';
 
-function spacingFactory(prefix: 'm' | 'p', cssPrefix: 'margin' | 'padding'): RuleEntry<{num: string, direction: SpacingDirection }> {
+function spacingFactory(prefix: 'm' | 'p', cssPrefix: 'margin' | 'padding'): RuleEntry<{num: string, direction?: SpacingDirection }> {
 	return {
-		match: new RegExp(`${prefix}(?<direction>[]?)-${numberRegex}`),
+		match: new RegExp(`${prefix}(?<direction>[xytrbl])?-${numberRegex}`),
 		cssRuleGetter(data): CSSRules {
+			if (!data.direction) {
+				data.direction = '';
+			}
 			const remValue = `${+data.num / 4}rem`;
 			const rules: CSSRules = {};
 
