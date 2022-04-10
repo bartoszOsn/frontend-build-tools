@@ -14,20 +14,18 @@
 \pworkplace{Instytut Informatyki Technicznej\\Katedra Sztucznej Inteligencji} % TODO
 
 \usepackage{hyperref}
+\usepackage{longtable}
 
 \begin{document}
 \maketitle
 \statementpage
 \abstractpage % TODO napisać streszczenie i słowa kluczowe
-{Stworzenie klasy \LaTeX-owej do użytku przy pisaniu pracy dyplomowej w SGGW}
-{Tematem niniejszej pracy było zaimplementowanie klasy \LaTeX-owej pozwalającej na formatowanie tekstu zgodnie z wytycznymi nałożonymi przez uczelnię. Praca zawiera dwie
-główne części. Pierwsza z nich zawiera opis najważniejszych aspektów implementacji klasy. Natomiast druga część skupia się na sposobie użycia klasy przez osoby piszące prace
-dyplomowe.}
-{LaTeX, klasa, praca dyplomowa, implementacja, SGGW, Szkoła Główna Gospodarstwa Wiejskiego}
-{Creation of the \LaTeX\ Class to be Used When Writing a Thesis at the Warsaw University of Life Sciences -- SGGW}
-{The subject of this study was to implement a \LaTeX\ class that allows for text formatting according to the guidelines imposed by the University. The work consists of two
-main parts. The first one describes the most important aspects of the implementation. The second part focuses on how to use the class by people writing the theses.}
-{LaTeX, class, thesis, implementation, SGGW, Warsaw University of Life Sciences}
+{Analiza działania oraz odtworzenie narzędzi front–endowych}
+{Tematem niniejszej pracy było opisanie działania dwóch typów narzędzi pomagających przy programowaniu aplikacji internetowych -- module bundlera i generatora atomicznych klas CSS -- a także stworzenie po jednym narzędziu z obu tych typów.}
+{module bundler, klasa atomiczna, generator css, narzędzia front-endowe}
+{Analysis and reconstruction of front--end tools}
+{The subject of this study was to describe how two of the front-end tool types works -- module bundler and css atomic class generator -- and rectreate one tool of each type.}
+{module bundler, atomic class, css generator, front-end tools}
 
 
 {
@@ -158,12 +156,83 @@ Sposobem na poradzenie sobie z tymi problemami jest generowanie klas na etapie b
 
 
 \section{Sposób działania}
+Zasada działania generatorów klas CSSowych jest prosta: Należy najpierw z kodu stylowanej aplikacji wydobyć wszystkie potencjalne klasy cssowe, następnie na podstawie zdefiniowanych reguł przypisać tym klasom odpowiedni kod CSS. Ostatnim krokiem jest zebranie wygenerowanego kodu i stworzenie pliku CSS zawierającego ten kod.
+
+Dla przykładu, we frameworku \emph{Tailwind} klasa nadająca szerokość elementowi zaczyna się od przedrostka \emph{w-}, po którym \emph{Tailwind} rozpoznaje, że chodzi o regułę związaną z szerokością (width), po którym następuje ciąg znaków określający wartość. Ciągiem tym może być po prostu wartość CSSowa, zapisana w kwadratowych nawiasach, na przykład \emph{w-[30px]}, ale także jedna z predefiniowanych wartości, jak na przykład \emph{w-96} lub \emph{w-full}, oznaczająca szerokość całego okna przeglądarki.
+
+Pewną wadą frameworku \emph{Tailwind} jest niemożność zdefiniowania nowych reguł -- jeśli żadna z istniejących reguł nie spełnia potrzeb programisty, musi on ręcznie napisać kod CSS.
+
+Ideą przyświecającą stworzeniu generatora klas CSSowych opisanego w tej pracy było to, aby zdefiniowanie nowych reguł było tak proste, jak to tylko możliwe. Reguła taka definiowana jest jako obiekt javascript posiadający dwa pola:
+\begin{itemize}
+    \item match -- wyrażenie regularne odpowiadające klasie css. Wyrażenie dla wcześniej opisanej klasy \emph{w-[WARTOŚĆ]} wyglądałoby tak: \verb|/^w-\[(?<value>.+)\]$$/|
+    \item cssRuleGetter -- funkcja otrzymująca na wejściu wartości nazwanych grup z wyrażenia regularnego, na wyjściu zwracająca zaś strukturę obiektów odpowiadającą kodowi CSS, na przykład:
+    \begin{verbatim}
+        {
+            'width': '30px'
+        }
+    \end{verbatim}
+\end{itemize}
+
+Kolejnym aspektem możliwym do zdefiniowania są \emph{modyfikatory} -- przykładem modifykatora we frameworku tailwind może być przedrostek \emph{hover:}. Poprzedzenie nim klasy atomicznej skutkuje tym, że reguła danej klasy jest aplikowana tylko wtedy, kiedy myszka znajduje się ponad elementem, na którym jest klasa.
+
+W generatorze klas CSSowych opisanym w tej pracy definiowanie modyfikatorów jest równie proste, co definiowanie reguł. Są one zdefiniowane przez bardzo podobny obiekt, posiadający dwa klucze:
+\begin{itemize}
+    \item match -- Podobnie jak w przypadku reguł, jest to wyrażenie regularne dopasowujące modyfikator, na przykład \verb|/^hover:/|
+    \item cssModifier -- funkcja na wejściu dostająca strukturę CSS zwróconą przez regułę, na wyjściu zaś zwracająca podobną, lecz zmodyfikowaną regułę.
+\end{itemize}
 
 % \section{Stworzone reguły generowania klas} % TODO jeśli będzie zbyt mało tekstu i trzeba będzie coś dopisać
 
 \chapter{Przykładowa aplikacja stworzona przy użyciu zaprezentowanych narzędzi}
+Aby zaprezentować działanie obu narzędzi opisanych w tej pracy stworzono prostą aplikację internetową, która używa obu z nich.
+
+Jest to prosta aplikacja, która pozwala uzupełnić listę rzeczy do zrobienia, a następnie odznaczyć na niej poszczególne zadania jako zrobione.
+
+Dzięki niej możemy się przekonać o użyteczności poszczególnych aspektów module bundlera oraz generatora klas css:
+\begin{itemize}
+    \item Aplikacja używa składni importowania oraz eksportowania opisanej w specyfikacji ES6.
+    \item Aplikacja została stworzona w oparciu o bibliotekę React, co pokazuje, że module bundler jest w stanie bez problemu odpowiednio przetworzyć kod zewnętrznej biblioteki dodany do aplikacji przy użyciu menadżera paczek, takiego jak npm lub yarn.
+    \item Biblioteka React do importowania oraz eksportowania używa formatu CommonJS, wiemy więc, że module bundler radzi sobie również z nim.
+    \item Aplikacja posiada style, a jednak w jej kodzie nie znajduje się żaden plik css -- generator klas cssowych generuje je na podstawie kodu.
+    \item Aplikacja używa również modyfikatorów, konkretnie modyfikatora hover -- po najechaniu na opis zadania zostaje on przekreślony.
+\end{itemize}
 
 \chapter{Podsumowanie i wnioski}
+Cel pracy został osiągnięty -- stworzono dwa działające oraz użyteczne narzędzia frontendowe -- module bundler oraz generator klas CSSowych.
+
+Oba z nich -- pomimo tego, że w pełni użyteczne, posiadają perspektywy dalszego rozwoju.
+Przede wszystkim, są one dostarczone tylko w postaci biblioteki, co zmusza ich użytkownika (programistę) stworzenia skryptu aby je uruchomić. Przydatną mogłaby okazać się możliwość uruchomienia ich z poziomu CLI.
+
+kolejne możliwości dalszego rozwoju to:
+\begin{itemize}
+    \item Module bundler wspiera specyfikację ES6 tylko częściowo -- o ile wspiera użycie każdego sposobu importu, pozwala jednak tylko na około połowę opisanych przez specyfikację sposobów eksportowania symboli -- to, które sposoby eksportowania są wspierane, obrazują wyniki testów jednostkowych znajdujących się w kodzie module bundlera:
+        \begin{longtable}{|p{13cm}|p{2cm}|}
+            \hline
+            \textbf{Opis testu}                                                                                                                                              & \textbf{Wynik testu} \\ \hline
+            \endfirsthead
+            %
+            \endhead
+            %
+            should transform "export let a;a = 5;" into "exports.a = void 0;\textbackslash{}nexports.a = 5;"                                                                 & pozytywny            \\ \hline
+            should transform "export let a, b;a = 5; b = 10;" into "(exports.a = void 0, exports.b = void 0)\textbackslash{}nexports.a = 5;\textbackslash{}nexports.b = 10;" & pozytywny            \\ \hline
+            should transform "export let a = 5;" into "exports.a = 5;"                                                                                                       & pozytywny            \\ \hline
+            should transform "export let a = 5, b = 10;" into "(exports.a = 5, exports.b = 10)"                                                                              & pozytywny            \\ \hline
+            should transform "export function func()\{\}" into "exports.func = function func() \{\textbackslash{}n\}"                                                        & pozytywny            \\ \hline
+            should transform "export class Cls \{\}" into "exports.Cls = class Cls \{\textbackslash{}n\}"                                                                    & pozytywny            \\ \hline
+            should transform "let a,b;export \{a, b\}" into "exports.a = a, exports.b = b;"                                                                                  & negatywny            \\ \hline
+            should transform "let a,b;export \{a as aliasA, b as aliasB\}" into "exports.aliasA = a, exports.aliasB = b;"                                                    & negatywny            \\ \hline
+            should transform "export const \{ a, b: c \} = o;" into "exports.a = o.a, exports.b = o.c"                                                                       & negatywny            \\ \hline
+            should transform "export default expression;" into "exports.default = expression;"                                                                               & negatywny            \\ \hline
+            should transform "export default function () \{\}" into "exports.default = function () \{\}"                                                                     & negatywny            \\ \hline
+            should transform "export default function a() \{\}" into "exports.default = function a() \{\}"                                                                   & negatywny            \\ \hline
+            should transform "export \{ a as default, b \};" into "exports.default = a, exports.b = b;"                                                                      & negatywny            \\ \hline
+            \caption{}
+            \label{tab:my-table}\\
+            \end{longtable}
+    \item generator klas CSSowych został stworzony z myślą, aby łatwo było tworzyć nowe reguły i modyfikatory, jednak reguły same w sobie nie miały być jego częścią. Reguły są dostarczaje jako \emph{pluginy} do samego generatora. Mimo to, w kodzie generatora znalazł się jeden przykładowy plugin, nazwany \emph{defaultPlugin} z kilkoma podstawowymi regułami, takimi jak marginesy lub kolory tła i tekstu. Dodanie do domyślnego pluginu kolejnych reguł, tak, aby dało się w pełni ostylować aplikację nie musząc tworzyć własnego pluginu na pewno dodałoby temu narzędziu pewną wartość.
+\end{itemize}
+
+Pomimo tych potencjalnych miejsc na usprawnienia, tak, jak napisano wyżej, oba narzędzia są w pełni sprawne oraz użyteczne.
 
 
 \begin{thebibliography}{9}

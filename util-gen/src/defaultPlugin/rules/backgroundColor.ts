@@ -12,7 +12,7 @@ export const backgroundColor: RuleEntry<{ hue: string, value: string }> = {
 		const hue = hues[data.hue];
 		const value = +data.value / 10;
 		return {
-			'background-color': `hsl(${hue}, 50%, ${value}%)`
+			'background-color': `hsl(${hue}, 50%, ${100 - value}%)`
 		};
 	}
 }
