@@ -11,7 +11,7 @@
 \thesis{Praca dyplomowa na kierunku:}
 \course{Informatyka}
 \promotor{dr.\ inż.\ Waldemara Karwowskiego, prof.\ SGGW}
-\pworkplace{Instytut Informatyki Technicznej\\Katedra Sztucznej Inteligencji} % TODO
+\pworkplace{Instytut Informatyki Technicznej\\Katedra Systemów Informatycznych} % TODO
 
 \usepackage{hyperref}
 \usepackage{longtable}
@@ -21,64 +21,59 @@
 \statementpage
 \abstractpage % TODO napisać streszczenie i słowa kluczowe
 {Analiza działania oraz odtworzenie narzędzi front–endowych}
-{Tematem niniejszej pracy było opisanie działania dwóch typów narzędzi pomagających przy programowaniu aplikacji internetowych -- module bundlera i generatora atomicznych klas CSS -- a także stworzenie po jednym narzędziu z obu tych typów.}
+{Tematem niniejszej pracy było opisanie działania dwóch typów narzędzi pomagających przy programowaniu aplikacji internetowych -- module bundlera i~generatora atomicznych klas CSS -- a~także stworzenie po jednym narzędziu z~obu tych typów.}
 {module bundler, klasa atomiczna, generator css, narzędzia front-endowe}
 {Analysis and reconstruction of front--end tools}
 {The subject of this study was to describe how two of the front-end tool types works -- module bundler and css atomic class generator -- and rectreate one tool of each type.}
 {module bundler, atomic class, css generator, front-end tools}
 
 
-{
-  % Spis treści może być złożony z pojedynczą interlinią, np. jeśli jedna linia wychodzi na następną stronę.
-  % W przeciwnym razie spis treści wstawić bez powyższego rozkazu i klamry.
-  \doublespacing
-  \tableofcontents
-}
+\tableofcontents
 
 \startchapterfromoddpage % niezależnie od długości spisu treści pierwszy rozdział zacznie się na nieparzystej stronie
 
 
 \chapter{Wstęp}
-Współczesne aplikacje internetowe najczęściej składają się z dwóch części: front--endowej oraz back--endowej. Rozróżnienie między nimi polega na tym, gdzie kod jest wykonywany -- jeśli jest on wykonywany po stronie serwera, mówimy o back--endzie, natomiast jeśli obliczenia wykonywane są na komputerze użytkownika, jest to front--end.
+Współczesne aplikacje internetowe najczęściej składają się z~dwóch części: front--endowej oraz back--endowej. Rozróżnienie między nimi polega na tym, gdzie kod jest wykonywany -- jeśli jest on wykonywany po stronie serwera, mówimy o back--endzie, natomiast jeśli obliczenia wykonywane są na komputerze użytkownika, jest to front--end.
 
-Programowanie front--endowe jest jedną z najszybciej rozwijających się dziedzin programowania. Technologie, które pięć lat temu były zdecydowanymi liderami na rynku dziś są uważane za przestarzałe. Tak szybka ewolucja technik developerskich połączona z potrzebą kompatybilności wstecznej aplikacji internetowych (Właściciele aplikacji chcą, aby działały one dla jak największej grupy klientów, a nie tylko dla tych, którzy posiadają najnowsze wersje przeglądarek) generuje problemy, które deweloperzy rozwiązują używając między innymi szerokiego zakresu narzędzi front--endowych.
+Programowanie front--endowe jest jedną z najszybciej rozwijających się dziedzin programowania. Technologie, które pięć lat temu były zdecydowanymi liderami na rynku dziś są uważane za przestarzałe. Tak szybka ewolucja technik developerskich połączona z potrzebą kompatybilności wstecznej aplikacji internetowych (Właściciele aplikacji chcą, aby działały one dla jak największej grupy klientów, a~nie tylko dla tych, którzy posiadają najnowsze wersje przeglądarek) generuje problemy, które deweloperzy rozwiązują używając między innymi szerokiego zakresu narzędzi front--endowych.
 
 \section{Charakterystyka narzędzi front-endowych}
 Podstawową cechą narzędzi front--endowych -- być może jedyną cechą wspólną dla większości narzędzi -- jest sposób ich konfiguracji. Większość narzędzi jest dostosowana do uruchomienia na dwa sposoby:
 \begin{enumerate}
-    \item Poprzez \emph{Command Line Interface} -- CLI -- wykonując krótki skrypt w wierszu poleceń takim jak np. Bash
-    \item Jako kod, najczęściej w języku Javascript -- narzędzie dostarczane jest developerowi jako biblioteka programistyczna. Programista tworzy plik, który wywołuje funkcje z dostarczonej biblioteki z odpowiednimi argumentami. Następnie za każdym razem, kiedy chce uruchomić narzędzie musi uruchomić stworzony przez siebie plik, np. przy użyciu środowiska Node.js, jeśli kod jest napisany w języku javascript.
+    \item Poprzez \emph{Command Line Interface} -- CLI -- wykonując krótką komendę w wierszu poleceń takim jak np. Bash
+    \item Jako kod, najczęściej w języku Javascript -- narzędzie dostarczane jest developerowi jako biblioteka programistyczna. Programista tworzy plik, który wywołuje funkcje z~dostarczonej biblioteki z~odpowiednimi argumentami. Następnie za każdym razem, kiedy chce uruchomić narzędzie musi uruchomić stworzony przez siebie plik, np. przy użyciu środowiska Node.js, jeśli kod jest napisany w języku javascript.
 \end{enumerate}
-Wiele narzędzi pozwala na uruchomienie ich przy użyciu obu tych metod: poprzez CLI w przypadkach, które nie wymagają skomplikowanej konfiguracji ani niestandardowych zachowań, oraz poprzez kod w bardziej skomplikowanych sytuacjach.
+Wiele narzędzi pozwala na uruchomienie ich przy użyciu obu tych metod: poprzez CLI w~przypadkach, które nie wymagają skomplikowanej konfiguracji ani niestandardowych zachowań, oraz poprzez kod w~bardziej skomplikowanych sytuacjach.
 
-Wiele narzędzi łączy obie te metody w taki sposób, że programista tworzy plik, np. javascript, który eksportuje obiekt definiujący konfigurację, a następnie w wierszu poleceń uruchamia narzędzie przekazując mu tylko jeden argument -- ścieżkę do wspomnianego wcześniej pliku.
+Wiele narzędzi łączy obie te metody w~taki sposób, że programista tworzy plik, np. javascript, który eksportuje obiekt definiujący konfigurację, a~następnie w~wierszu poleceń uruchamia narzędzie przekazując mu tylko jeden argument -- ścieżkę do wspomnianego wcześniej pliku.
 
 \section{Wybór typów narzędzi}
 Praca ta ma na celu przeanalizowanie działania dwóch typów narzędzi frontendowych:
 \begin{itemize}
-    \item Module bundler -- Narzędzie, które łączy kod aplikacji rozdzielony na wiele plików w jeden plik, w ten sposób zamieniając kod przyjazny deweloperowi na wydajny kod wspierający starsze przeglądarki, które nie pozwalały na nowoczesne metody importowania i eksportowania symboli w plikach javascript. Przykładami istniejących narzędzi tego typu są \emph{Webpack} oraz \emph{Parcel}
-    \item Generator CSS--owych klas atomicznych -- Narzędzie, które przeszukuje kod aplikacji, szukając w niej nazw klas, dla których mogą być zdefiniowane pewne style CSS, a następnie generuje plik CSS z odpowiednimi stylami. Przykładem może być \emph{Tailwind\cite{Tailwind_jit}} działający w trybie \emph{Just in Time} oraz \emph{UnoCSS\cite{unocss}}
+    \item Module bundler -- Narzędzie, które łączy kod aplikacji rozdzielony na wiele plików w~jeden plik, w~ten sposób zamieniając kod przyjazny deweloperowi na wydajny kod wspierający starsze przeglądarki, które nie pozwalały na nowoczesne metody importowania i eksportowania symboli w plikach javascript. Przykładami istniejących narzędzi tego typu są \emph{Webpack} oraz \emph{Parcel}
+    \item Generator CSS--owych klas atomicznych -- Narzędzie, które przeszukuje kod aplikacji, szukając w niej nazw klas, dla których mogą być zdefiniowane pewne style CSS, a następnie generuje plik CSS z~odpowiednimi stylami. Przykładem może być \emph{Tailwind\cite{Tailwind_jit}} działający w trybie \emph{Just in Time} oraz \emph{UnoCSS\cite{unocss}}
 \end{itemize}
 Oba te typy narzędzi posiadają swoich przedstawicieli, na których będzie można się skupić podczas analizowania sposobu ich działania.
 
 
 \chapter{Module bundler}
-\emph{Module budler} to -- jak wspomniano wyżej -- narzędzie służące do "sklejenia" kodu znajdującego się w wielu plikach w jeden duży plik. Służy to kilku celom:
+\emph{Module budler} to -- jak wspomniano wyżej -- narzędzie służące do "sklejenia" kodu znajdującego się w~wielu plikach w~jeden duży plik. Służy to kilku celom:
 \begin{itemize}
-    \item Zmniejszenie ilości zapytań do serwera -- Duże, komercyjne aplikacje nierzadko składają się z setek lub tysięcy plików. Wdrożenie aplikacji rozdzielonej w taki sposób wiązało by się z wysyłaniem setek lub tysięcy zapytań z przeglądarki na serwer podczas każdorazowego odwiedzenia strony. Byłoby to duże obciążenie dla przeglądarki oraz ogromne obciążenie dla serwera.
-    \item Utrzymanie kompatybilności wstecznej -- Specyfikacja javascript pozwala na importowanie oraz eksportowanie symboli z oraz do plików, jednak zostało to zaimplementowane w najpopularniejszych przeglądarkach stosunkowo niedawno -- pierwsze wersje Google Chrome, Opery oraz Safari wspierające javascriptowe moduły zostały wydane w 2017 roku. Rok później dołączyły do nich Mozilla Firefox oraz Microsoft Edge.\cite{es6_modules_support}
+    \item Zmniejszenie ilości zapytań do serwera -- Duże, komercyjne aplikacje nierzadko składają się z~setek lub tysięcy plików. Wdrożenie aplikacji rozdzielonej w taki sposób wiązało by się z~wysyłaniem setek lub tysięcy zapytań z przeglądarki na serwer podczas każdorazowego odwiedzenia strony. Byłoby to duże obciążenie dla przeglądarki oraz ogromne obciążenie dla serwera.
+    \item Utrzymanie kompatybilności wstecznej -- Specyfikacja javascript pozwala na importowanie oraz eksportowanie symboli z~oraz do plików, jednak zostało to zaimplementowane w najpopularniejszych przeglądarkach stosunkowo niedawno -- pierwsze wersje Google Chrome, Opery oraz Safari wspierające javascriptowe moduły zostały wydane w~2017 roku. Rok później dołączyły do nich Mozilla Firefox oraz Microsoft Edge.\cite{es6_modules_support}
 \end{itemize}
 
-Istnieje kilka formatów modułów javascript. Najpopularniejsze z nich to UMD, CommonJS oraz format opisany w specyfikacji ES6, przy czym UMD jest w ostatnich latach coraz rzadziej używany.\cite{es6_for_humans}
+Istnieje kilka formatów modułów javascript. Najpopularniejsze z~nich to UMD, CommonJS oraz format opisany w~specyfikacji ES6, przy czym UMD jest w~ostatnich latach coraz rzadziej używany.\cite{es6_for_humans}
 
-Module bundler stworzony przeze mnie wspiera zarówno CommonJS jak i ES6. Format opisany w specyfikacji ES6 staje się coraz bardziej popularny, i możemy przewidywać, że w przyszłości wyprze format CommonJS, na co może wskazywać chociażby to, że obecnie został on zaimplementowany tak w przeglądarkach, jak i w środowisku Node.js, które wcześniej wspierało tylko CommonJS\cite{nodejs_modules}. Z tego powodu mój module bundler skupia się na ES6, jednak nie można było pominąć formatu CommonJS -- Używa go ogromna część najpopularniejszych bibliotek javascriptowych, w tym np. React. Aby kod tych bibliotek został poprawnie zaimportowany w aplikacji module bundler musi wspierać format, w jakim jest stworzona biblioteka.
+Module bundler stworzony na potrzeby tej pracy wspiera zarówno CommonJS jak i~ES6. Format opisany w~specyfikacji ES6 staje się coraz bardziej popularny i~możemy przewidywać, że w~przyszłości wyprze format CommonJS, na co może wskazywać chociażby to, że obecnie został on zaimplementowany tak w~przeglądarkach, jak i~w~środowisku Node.js, które wcześniej wspierało tylko CommonJS\cite{nodejs_modules}. Z~tego powodu module bundler opisany w tej pracy skupia się na ES6, jednak nie można było pominąć formatu CommonJS -- Używa go ogromna część najpopularniejszych bibliotek javascriptowych, w~tym np. React. Aby kod biblioteki został poprawnie zaimportowany w aplikacji module bundler musi wspierać format, z~jakiego korzysta ta biblioteka.
 
 
 \section{Sposoby bundlowania}
 % https://parceljs.org/features/scope-hoisting/
-Większość module bundlerów używa jednego z dwóch sposobów na bundlowanie modułów: Korzystająć z IIFE lub używając techniki zwanej Scope Hoisting, z czego ta druga z nich jest zdecydowanie częściej używana\cite{parcel_scope_hoisting}.
+Większość module bundlerów używa jednego z~dwóch sposobów na bundlowanie modułów: Korzystająć z~\emph{IIFE} lub używając techniki zwanej \emph{Scope Hoisting}, z~czego ta druga jest zdecydowanie częściej używana\cite{parcel_scope_hoisting}.
 
-Scope hoisting polega na "wrzuceniu" zawartości każdego modułu do jednego pliku, jednocześnie zmieniając nazwy wszystkich symboli w tym module, takich jak klasy, zmienne, stałe lub metody. Każda z takich nazw staje się unikalna dla modułu, tak, aby symbole o takiej samej nazwie pochodzące z różnych modułów w pliku wyjściowym miały inną nazwę.
+\emph{Scope hoisting} polega na scaleniu zawartości każdego modułu w~jeden plik, jednocześnie zmieniając nazwy wszystkich symboli w~tym module, takich jak klasy, zmienne, stałe lub metody. Każda z~takich nazw staje się unikalna dla modułu, tak, aby symbole o~takiej samej nazwie pochodzące z~różnych modułów w~pliku wyjściowym miały inną nazwę.
 
 Oto przykład demonstrujący scope hoisting. Na wejściu mamy dwa pliki, "math.js" oraz "index.js".
 
@@ -116,56 +111,64 @@ console.log($fa6943ce8a6b29$add(2, 3));
 console.log($fa6943ce8a6b29$square(5));
 \end{verbatim}
 
-Druga najczęściej używana metoda polega na reprezentacji każdego modułu jako funkcji. W momencie, kiedy jeden moduł importuje pewne symbole z innego modułu, metoda reprezentująca zaimportowany moduł jest wykonywana. Następnie zwrócone wyniki zostają dostarczone do modułu importującego, a także zapisane w cache. Kiedy koejny moduł zaimportuje coś z tego samego modułu, funkcja nie wykona się kolejny raz. Zamiast tego, moduł dostanie wyniki z cache. Jest to istotne, ponieważ w specyfikacji Javascript moduły są singletonami. Oznacza to, że kiedy dwa moduły zaimportują te same symbole z innego modułu, oba dostaną te same symbole, a nie identyczne kopie. Jeśli więc jeden z tych kodułów w jakiś sposób zmieni coś w jednym z zaimportowanych symboli, będzie to także miało effekt w drugim module, który zaimportował ten symbol.
+Druga najczęściej używana metoda polega na reprezentacji każdego modułu jako funkcji. W~momencie, kiedy jeden moduł importuje pewne symbole z~innego modułu, metoda reprezentująca zaimportowany moduł jest wykonywana. Następnie zwrócone wyniki zostają dostarczone do modułu importującego, a~także zapisane w~cache. Kiedy kolejny moduł zaimportuje coś z~tego samego modułu, funkcja nie wykona się kolejny raz. Zamiast tego, moduł dostanie wyniki z~cache. Jest to istotne, ponieważ w~specyfikacji Javascript moduły są singletonami\cite{object_oriented_javascript}. Oznacza to, że kiedy dwa moduły zaimportują te same symbole z~innego modułu, oba dostaną te same symbole, a~nie identyczne kopie. Jeśli więc jeden z tych modułów w~jakiś sposób zmieni coś w~jednym z zaimportowanych symboli, będzie to także miało efekt w~drugim module, który zaimportował ten symbol.
 
-Ja w swoim module bundlerze zdecydowałem się skorzystać z drugiej metody.
+Module bundler opisany w~tej pracy korzysta z~drugiej z~tych metod.
 
 
-\section{Transformacja kodu javascript przy użyciu parsera}
-\section{Zależności cykliczne}
 \section{Testowanie module bundlera}
+Aby mieć pewność, że module bundler opisany w~tej pracy jest użyteczny a~także zgodny ze specyfikacją ES6 stworzone do niego dwa rodzaje testów: testy jednostowe oraz testy integracyjne.
+
+Testów jednostkowych użyto, aby sprawdzić poprawność działania następujących, pojedynczych komponentów składających się na kod module bundlera:
+\begin{itemize}
+    \item Kod służący do transformowania kodu javascript na podstawie podanej konfiguracji, użyto go na przykład do transformowania wyrażeń importu na wyrażenia przypisania wartości do zmiennej.
+    \item Kod opisujący reguły transformowania wyrażeń eksportowania. Przykładowy test na wejściu otrzymuje kod \verb|export let a = 5;|, natomiast oczekiwany wynik to \verb|exports.a = 5;|.
+    \item Kod opisujący reguły transformowania wyrażeń importowania. Przykładowy test na wejściu otrzymuje kod \verb|import { export1 } from "module-name";|, natomiast oczekiwany wynik to \verb|const {export1: export1} = require('module-name');|.
+\end{itemize}
+
+W~repozytorium module bundlera znalazł się także jeden test integracyjny. Jest to bardzo prosta aplikacja rozbita na kilka plików, która wykonuje pewne asercje, których wynik polega na wartościach zaimportowanych z innych plików. Kod tej aplikacji jest bundlowany przy pomocy module bundlera, a następnie wykonywany wewnątrz testu frameworka \emph{Jest}\cite{jest}, służącego zazwyczaj do testów jednostkowych. Framework ten bada, czy wszystkie asercje wykonane w~ramach kodu są prawdą. Kod aplikacji testowej napisany jest w~taki sposób, że jeśli asercja okazałaby się fałszywa, znaczyłoby to błędnie zbundlowany kod.
 
 \chapter{Generator CSSowych klas atomicznych}
-Tradycyjne podejście do pisania kodu CSS polega wybieraniu konkretnych elementów html a następnie nadawaniu im serii reguł. Na przykład, mając na stronie okno dialogowe posiadające klasę ".dialog" w pliku CSS określili byśmy, że każdy element posiadający klasę ".dialog" musi być ponad wszystkimi innymi elementami, musi być wyśrodkowany na stronie, musi mieć białe tło oraz ciemny cień.
+Tradycyjne podejście do pisania kodu CSS polega wybieraniu konkretnych elementów html, a~następnie nadawaniu im serii reguł. Na przykład, mając na stronie okno dialogowe posiadające klasę ".dialog" w~pliku CSS określili byśmy, że każdy element posiadający klasę ".dialog" musi być ponad wszystkimi innymi elementami, musi być wyśrodkowany na stronie, musi mieć białe tło oraz ciemny cień.
 
-Problemy z takim podejściem pojawiają się, kiedy chcemy nadać style bardziej specyficznym stylom. Kontynuując poprzedni przykład, załóżmy, że w naszym oknie dialogowym posiadamy przycisk, wewnątrz którego znajduje się element <img> wyświetlający kółko sugerujące że ma miejsce jakaś akcja i przed naciśnięciem przycisku należy poczekać na jej zakończenie. Zazwyczaj takie ikony koła, zwane loaderami obracają się wokół własnej osi. Taki ruch najłatwiej wymusić poprzez style CSS. Aby jednak nadać jakieś reguły temu elementowi, musimy napisać selektor, który mówi o tym, że chcemy wybrać element <img>, który znajduje się wewnątrz elementu <button>, który znajduje się wewnątrz elementu posiadającego klasę ".dialog".
+Problemy z~takim podejściem pojawiają się, kiedy chcemy nadać style bardziej specyficznym elementom. Kontynuując poprzedni przykład, załóżmy, że w~naszym oknie dialogowym posiadamy przycisk, wewnątrz którego znajduje się element <img> wyświetlający kółko sugerujące że ma miejsce jakaś akcja i~przed naciśnięciem przycisku należy poczekać na jej zakończenie. Zazwyczaj takie ikony koła -- zwane loaderami -- obracają się wokół własnej osi. Taki ruch najłatwiej wymusić poprzez style CSS. Aby jednak nadać jakieś reguły temu elementowi, musimy napisać selektor, który mówi o~tym, że chcemy wybrać element \verb|<img>|, który znajduje się wewnątrz elementu \verb|<button>|, który znajduje się wewnątrz elementu posiadającego klasę ".dialog".
 
-Takie podejście ma swoje wady, jednym z nich jest potrzeba odzwierciedlenia struktury html wewnątrz pliku css, co jest żmudne oraz niepewne, biorąc pod uwagę, że struktura może się w pewnym momencie zmienić.
+Takie podejście ma swoje wady, jednym z~nich jest potrzeba odzwierciedlenia struktury html wewnątrz pliku css, co jest żmudne oraz niepewne, biorąc pod uwagę, że struktura może się w~pewnym momencie zmienić.
 
-Alternatywnym podejściem, wolnym od tych problemów jest użycie klas atomicznych.
+Alternatywnym podejściem, wolnym od tych problemów jest użycie klas atomicznych\cite{css_master}.
 
 
 \section{Czym są klasy atomiczne?}
 Klasy atomiczne to CSSowe klasy, które mają do siebie przyporządkowaną tylko jedną regułę CSS. Klasa ".dialog" opisywana wyżej nie jest klasą atomiczną, jednak można ją zastąpić kilkoma innymi klasami atomicznymi:
 \begin{itemize}
-    \item klasa z regułą określającą, że element z tą klasą musi być wyświetlany ponad wszystkimi innymi, np. ".z-10000" i odpowiadająca jej reguła "z-index: 10000"
-    \item kilka klas z regułami powalającymi wycentrować element, np. "display: flex" oraz "align-items: center"
-    \item klasa z regułą odpowiadająca kolorowi tła, np. ".bg-white" i reguła: "background-color: white"
-    \item klasa z regułą definującą cień
+    \item klasa z~regułą określającą, że element z~tą klasą musi być wyświetlany ponad wszystkimi innymi, np. ".z-10000" i~odpowiadająca jej reguła "z-index: 10000"
+    \item kilka klas z~regułami powalającymi wycentrować element, np. "display: flex" oraz "align-items: center"
+    \item klasa z~regułą odpowiadająca kolorowi tła, np. ".bg-white" i~reguła: "background-color: white"
+    \item klasa z~regułą definującą cień
 \end{itemize}
 
-Chcąc sprawić, aby nasz loader się obracał, wystarczyłoby nadać mu osdowiednią klasę atomiczną, np. ".spin". W ten sposób nie polegalibyśmy już na strukturze HTML, tak, jak robiliśmy to w poprzednim podejściu.
+Chcąc sprawić, aby nasz loader się obracał, wystarczyłoby nadać mu odpowiednią klasę atomiczną, np. ".spin". W~ten sposób nie polegalibyśmy już na strukturze HTML, tak, jak robiliśmy to w~poprzednim podejściu.
 
 
 \section{Powody używania generatora klas atomicznych}
-Co łatwo zauważyć, podejście takie wymaga napisania dużej ilości klas CSSowych, co jest żmudnym zajęciem. W przeszłości z tym problemem radzono sobie używając zewnętrznych bibliotek. W ten sposób w przeszłości działał np. tailwind - dostarczał on zbiór bardzo wielu klas atomicznych, których następnie developer używał do nadawania stylów elementom HTMLowym. W ramach jednego projektu używano jednak najczęściej tylko niewielką część wszystkich dostarczonych klas. Cała reszta była niepotrzebna, a jednak dalej znajdowała się w pliku, zwiększając jego rozmiar, jednocześnie opóźniając pełne załadowanie stylów w przeglądarce.
+Co łatwo zauważyć, podejście takie wymaga napisania dużej ilości klas CSSowych, co jest żmudnym zajęciem. W~przeszłości z~tym problemem radzono sobie używając zewnętrznych bibliotek. W~ten sposób w przeszłości działał np. \emph{Tailwind} - dostarczał on zbiór bardzo wielu klas atomicznych, których następnie developer używał do nadawania stylów elementom HTMLowym. W~ramach jednego projektu używano jednak najczęściej tylko niewielką część wszystkich dostarczonych klas. Cała reszta była niepotrzebna, a~jednak dalej znajdowała się w~pliku, zwiększając jego rozmiar, jednocześnie opóźniając pełne załadowanie stylów w~przeglądarce.
 
-Wiązał się z tym także kolejny problem - jakkolwiek zestaw klas był bardzo bogaty, dalej nie pokrywał on wszystkich możliwych potrzeb -- na przykład nie można stworzyć takiej ilości klas, które pozwalały by na nadanie dowolnego możliwego koloru tła.
+Wiązał się z~tym także kolejny problem - jakkolwiek zestaw klas był bardzo bogaty, dalej nie pokrywał on wszystkich możliwych potrzeb -- na przykład nie można stworzyć takiej ilości klas, które pozwalały by na nadanie dowolnego możliwego koloru tła.
 
-Sposobem na poradzenie sobie z tymi problemami jest generowanie klas na etapie budowania projektu -- nie można przewidzieć wszystkich potrzebnych developerowi klas, ale można sprawdzić, jakich klas użył, a następnie wygenerować je razem z odpowiadającymi im regułami.
+Sposobem na poradzenie sobie z~tymi problemami jest generowanie klas na etapie budowania projektu -- nie można przewidzieć wszystkich potrzebnych developerowi klas, ale można sprawdzić, jakich klas użył, a~następnie wygenerować je razem z~odpowiadającymi im regułami.
 
 
 \section{Sposób działania}
-Zasada działania generatorów klas CSSowych jest prosta: Należy najpierw z kodu stylowanej aplikacji wydobyć wszystkie potencjalne klasy cssowe, następnie na podstawie zdefiniowanych reguł przypisać tym klasom odpowiedni kod CSS. Ostatnim krokiem jest zebranie wygenerowanego kodu i stworzenie pliku CSS zawierającego ten kod.
+Zasada działania generatorów klas CSSowych jest prosta: Należy najpierw z~kodu stylowanej aplikacji wydobyć wszystkie potencjalne klasy cssowe, następnie na podstawie zdefiniowanych reguł przypisać tym klasom odpowiedni kod CSS. Ostatnim krokiem jest zebranie wygenerowanego kodu i~stworzenie pliku CSS zawierającego ten kod.
 
-Dla przykładu, we frameworku \emph{Tailwind} klasa nadająca szerokość elementowi zaczyna się od przedrostka \emph{w-}, po którym \emph{Tailwind} rozpoznaje, że chodzi o regułę związaną z szerokością (width), po którym następuje ciąg znaków określający wartość. Ciągiem tym może być po prostu wartość CSSowa, zapisana w kwadratowych nawiasach, na przykład \emph{w-[30px]}, ale także jedna z predefiniowanych wartości, jak na przykład \emph{w-96} lub \emph{w-full}, oznaczająca szerokość całego okna przeglądarki.
+Dla przykładu, we frameworku \emph{Tailwind} klasa nadająca szerokość elementowi zaczyna się od przedrostka \emph{w-}, po którym \emph{Tailwind} rozpoznaje, że chodzi o~regułę związaną z~szerokością (width), po którym następuje ciąg znaków określający wartość. Ciągiem tym może być po prostu wartość CSSowa, zapisana w kwadratowych nawiasach, na przykład \emph{w-[30px]}, ale także jedna z predefiniowanych wartości, jak na przykład \emph{w-96} lub \emph{w-full}, oznaczająca szerokość całego okna przeglądarki\cite{Tailwind_jit}.
 
-Pewną wadą frameworku \emph{Tailwind} jest niemożność zdefiniowania nowych reguł -- jeśli żadna z istniejących reguł nie spełnia potrzeb programisty, musi on ręcznie napisać kod CSS.
+Pewną wadą frameworku \emph{Tailwind} jest niemożność zdefiniowania nowych reguł -- jeśli żadna z~istniejących reguł nie spełnia potrzeb programisty, musi on ręcznie napisać kod CSS.
 
-Ideą przyświecającą stworzeniu generatora klas CSSowych opisanego w tej pracy było to, aby zdefiniowanie nowych reguł było tak proste, jak to tylko możliwe. Reguła taka definiowana jest jako obiekt javascript posiadający dwa pola:
+Ideą przyświecającą stworzeniu generatora klas CSSowych opisanego w~tej pracy było to, aby zdefiniowanie nowych reguł było tak proste, jak to tylko możliwe. Reguła taka definiowana jest jako obiekt javascript posiadający dwa pola:
 \begin{itemize}
     \item match -- wyrażenie regularne odpowiadające klasie css. Wyrażenie dla wcześniej opisanej klasy \emph{w-[WARTOŚĆ]} wyglądałoby tak: \verb|/^w-\[(?<value>.+)\]$$/|
-    \item cssRuleGetter -- funkcja otrzymująca na wejściu wartości nazwanych grup z wyrażenia regularnego, na wyjściu zwracająca zaś strukturę obiektów odpowiadającą kodowi CSS, na przykład:
+    \item cssRuleGetter -- funkcja otrzymująca na wejściu wartości nazwanych grup z~wyrażenia regularnego, na wyjściu zwracająca zaś strukturę obiektów odpowiadającą kodowi CSS, na przykład:
     \begin{verbatim}
         {
             'width': '30px'
@@ -173,39 +176,37 @@ Ideą przyświecającą stworzeniu generatora klas CSSowych opisanego w tej prac
     \end{verbatim}
 \end{itemize}
 
-Kolejnym aspektem możliwym do zdefiniowania są \emph{modyfikatory} -- przykładem modifykatora we frameworku tailwind może być przedrostek \emph{hover:}. Poprzedzenie nim klasy atomicznej skutkuje tym, że reguła danej klasy jest aplikowana tylko wtedy, kiedy myszka znajduje się ponad elementem, na którym jest klasa.
+Kolejnym aspektem możliwym do zdefiniowania są \emph{modyfikatory} -- przykładem modifykatora we frameworku \emph{Tailwind} może być przedrostek \emph{hover:}. Poprzedzenie nim klasy atomicznej skutkuje tym, że reguła danej klasy jest aplikowana tylko wtedy, kiedy kursor znajduje się ponad elementem, na którym jest klasa.
 
-W generatorze klas CSSowych opisanym w tej pracy definiowanie modyfikatorów jest równie proste, co definiowanie reguł. Są one zdefiniowane przez bardzo podobny obiekt, posiadający dwa klucze:
+W~generatorze klas CSSowych opisanym w~tej pracy definiowanie modyfikatorów jest równie proste, co definiowanie reguł. Są one zdefiniowane przez bardzo podobny obiekt, posiadający dwa klucze:
 \begin{itemize}
-    \item match -- Podobnie jak w przypadku reguł, jest to wyrażenie regularne dopasowujące modyfikator, na przykład \verb|/^hover:/|
+    \item match -- Podobnie jak w~przypadku reguł, jest to wyrażenie regularne dopasowujące modyfikator, na przykład \verb|/^hover:/|
     \item cssModifier -- funkcja na wejściu dostająca strukturę CSS zwróconą przez regułę, na wyjściu zaś zwracająca podobną, lecz zmodyfikowaną regułę.
 \end{itemize}
 
-% \section{Stworzone reguły generowania klas} % TODO jeśli będzie zbyt mało tekstu i trzeba będzie coś dopisać
-
 \chapter{Przykładowa aplikacja stworzona przy użyciu zaprezentowanych narzędzi}
-Aby zaprezentować działanie obu narzędzi opisanych w tej pracy stworzono prostą aplikację internetową, która używa obu z nich.
+Aby zaprezentować działanie obu narzędzi opisanych w tej pracy stworzono prostą aplikację internetową, która używa obu z~nich.
 
 Jest to prosta aplikacja, która pozwala uzupełnić listę rzeczy do zrobienia, a następnie odznaczyć na niej poszczególne zadania jako zrobione.
 
-Dzięki niej możemy się przekonać o użyteczności poszczególnych aspektów module bundlera oraz generatora klas css:
+Demonstruje ona użyteczność poszczególnych aspektów module bundlera oraz generatora klas css:
 \begin{itemize}
     \item Aplikacja używa składni importowania oraz eksportowania opisanej w specyfikacji ES6.
-    \item Aplikacja została stworzona w oparciu o bibliotekę React, co pokazuje, że module bundler jest w stanie bez problemu odpowiednio przetworzyć kod zewnętrznej biblioteki dodany do aplikacji przy użyciu menadżera paczek, takiego jak npm lub yarn.
-    \item Biblioteka React do importowania oraz eksportowania używa formatu CommonJS, wiemy więc, że module bundler radzi sobie również z nim.
-    \item Aplikacja posiada style, a jednak w jej kodzie nie znajduje się żaden plik css -- generator klas cssowych generuje je na podstawie kodu.
+    \item Aplikacja została stworzona w oparciu o~bibliotekę React, co pokazuje, że module bundler jest w~stanie bez problemu odpowiednio przetworzyć kod zewnętrznej biblioteki dodany do aplikacji przy użyciu menadżera paczek, takiego jak npm lub yarn.
+    \item Biblioteka React do importowania oraz eksportowania używa formatu CommonJS, wiadomo więc, że module bundler radzi sobie również z~nim.
+    \item Aplikacja posiada style, a~jednak w jej kodzie nie znajduje się żaden plik css -- generator klas cssowych generuje je na podstawie kodu.
     \item Aplikacja używa również modyfikatorów, konkretnie modyfikatora hover -- po najechaniu na opis zadania zostaje on przekreślony.
 \end{itemize}
 
 \chapter{Podsumowanie i wnioski}
 Cel pracy został osiągnięty -- stworzono dwa działające oraz użyteczne narzędzia frontendowe -- module bundler oraz generator klas CSSowych.
 
-Oba z nich -- pomimo tego, że w pełni użyteczne, posiadają perspektywy dalszego rozwoju.
-Przede wszystkim, są one dostarczone tylko w postaci biblioteki, co zmusza ich użytkownika (programistę) stworzenia skryptu aby je uruchomić. Przydatną mogłaby okazać się możliwość uruchomienia ich z poziomu CLI.
+Oba z~nich -- pomimo tego, że w~pełni użyteczne, posiadają perspektywy dalszego rozwoju.
+Przede wszystkim, są one dostarczone tylko w~postaci biblioteki, co zmusza ich użytkownika (programistę) stworzenia skryptu aby je uruchomić. Przydatną mogłaby okazać się możliwość uruchomienia ich z~poziomu CLI.
 
 kolejne możliwości dalszego rozwoju to:
 \begin{itemize}
-    \item Module bundler wspiera specyfikację ES6 tylko częściowo -- o ile wspiera użycie każdego sposobu importu, pozwala jednak tylko na około połowę opisanych przez specyfikację sposobów eksportowania symboli -- to, które sposoby eksportowania są wspierane, obrazują wyniki testów jednostkowych znajdujących się w kodzie module bundlera:
+    \item Module bundler wspiera specyfikację ES6 tylko częściowo -- o ile wspiera użycie każdego sposobu importu, pozwala jednak tylko na około połowę opisanych przez specyfikację sposobów eksportowania symboli -- to, które sposoby eksportowania są wspierane, obrazują wyniki testów jednostkowych znajdujących się w~kodzie module bundlera:
         \begin{longtable}{|p{13cm}|p{2cm}|}
             \hline
             \textbf{Opis testu}                                                                                                                                              & \textbf{Wynik testu} \\ \hline
@@ -229,7 +230,7 @@ kolejne możliwości dalszego rozwoju to:
             \caption{}
             \label{tab:my-table}\\
             \end{longtable}
-    \item generator klas CSSowych został stworzony z myślą, aby łatwo było tworzyć nowe reguły i modyfikatory, jednak reguły same w sobie nie miały być jego częścią. Reguły są dostarczaje jako \emph{pluginy} do samego generatora. Mimo to, w kodzie generatora znalazł się jeden przykładowy plugin, nazwany \emph{defaultPlugin} z kilkoma podstawowymi regułami, takimi jak marginesy lub kolory tła i tekstu. Dodanie do domyślnego pluginu kolejnych reguł, tak, aby dało się w pełni ostylować aplikację nie musząc tworzyć własnego pluginu na pewno dodałoby temu narzędziu pewną wartość.
+    \item generator klas CSSowych został stworzony z~myślą, aby łatwo było tworzyć nowe reguły i~modyfikatory, jednak reguły same w~sobie nie miały być jego częścią. Reguły są dostarczane jako \emph{pluginy} do samego generatora. Mimo to, w~kodzie generatora znalazł się jeden przykładowy plugin, nazwany \emph{defaultPlugin} z~kilkoma podstawowymi regułami, takimi jak marginesy lub kolory tła i tekstu. Dodanie do domyślnego pluginu kolejnych reguł, tak, aby dało się w pełni ostylować aplikację nie musząc tworzyć własnego pluginu na pewno dodałoby temu narzędziu pewną wartość.
 \end{itemize}
 
 Pomimo tych potencjalnych miejsc na usprawnienia, tak, jak napisano wyżej, oba narzędzia są w pełni sprawne oraz użyteczne.
@@ -266,6 +267,16 @@ Axel Rauschmayer, \textit{Exploring JS}
 
 \bibitem{es6_for_humans}
 Grover D., Kunduru H.P. (2017) ES6 for Humans. Apress, Berkeley, CA.
+
+\bibitem{object_oriented_javascript}
+Antani V., Stefanov S. (2017) Object--Oriented JavaScript. Packt Publishing
+
+\bibitem{jest}
+\textit{Jest -- Delightful JavaScript Testing}
+\url{https://jestjs.io/} (dostęp 11.04.2022)
+
+\bibitem{css_master}
+Brown T. (2018) CSS Master. SitePoint
 
 \bibitem{nodejs_modules}
 \textit{Modules: ECMAScript modules -- Node.js v17.7.1 documentation}
