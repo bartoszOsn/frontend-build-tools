@@ -23,8 +23,8 @@ export function AppComponent() {
 				)
 			}
 			<div>
-				<input key="input" value={newEntryDesc} onInput={(e) => setNewEntryDesc(e.target.value)} />
-				<button key="button" onClick={() => entries.addEntry(newEntryDesc, false)}>Add</button>
+				<input key="input" value={newEntryDesc} className='p-1' placeholder='Task name' onInput={(e) => setNewEntryDesc(e.target.value)} />
+				<button key="button" className='ml-2' onClick={() => entries.addEntry(newEntryDesc, false)}>Add</button>
 			</div>
 		</div>
 	)

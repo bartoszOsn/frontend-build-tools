@@ -6,5 +6,5 @@
   "author": "Bartosz Osiński",
   "license": "MIT",
   "private": true,
-  "workspaces": ["module-bundler"]
+  "workspaces": ["module-bundler", "util-gen"]
 }

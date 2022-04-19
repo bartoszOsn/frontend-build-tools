@@ -184,8 +184,15 @@ W~generatorze klas CSSowych opisanym w~tej pracy definiowanie modyfikatorów jes
     \item cssModifier -- funkcja na wejściu dostająca strukturę CSS zwróconą przez regułę, na wyjściu zaś zwracająca podobną, lecz zmodyfikowaną regułę.
 \end{itemize}
 
+
 \chapter{Przykładowa aplikacja stworzona przy użyciu zaprezentowanych narzędzi}
 Aby zaprezentować działanie obu narzędzi opisanych w tej pracy stworzono prostą aplikację internetową, która używa obu z~nich.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{test-app.png}
+    \caption{Zrzut ekranu z opisywanej aplikacji}
+\end{figure}
 
 Jest to prosta aplikacja, która pozwala uzupełnić listę rzeczy do zrobienia, a następnie odznaczyć na niej poszczególne zadania jako zrobione.
 
@@ -197,6 +204,65 @@ Demonstruje ona użyteczność poszczególnych aspektów module bundlera oraz ge
     \item Aplikacja posiada style, a~jednak w jej kodzie nie znajduje się żaden plik css -- generator klas cssowych generuje je na podstawie kodu.
     \item Aplikacja używa również modyfikatorów, konkretnie modyfikatora hover -- po najechaniu na opis zadania zostaje on przekreślony.
 \end{itemize}
+
+Aby uruchomić aplikację, należy przejść do folderu \verb|test-application| i uruchomić w nim komendę \verb|npm run start|. Robi ona kilka rzeczy - tworzy serwer hostujący pliki pod adresem \verb|http://localhost:3000/|, nasłuchuje na zmiany w kodzie źródłowym oraz -- co najważniejsze -- wykonuje on dwa skrypty z folderu \verb|config| -- \verb|bundle.ts| oraz \verb|generate-utils.ts|. Służą one do uruchomienia -- kolejno -- module bundlera oraz generatora klas atomicznych.
+
+Zawartość pliku \verb|bundle.ts| wygląda następująco:
+
+\begin{verbatim}
+import * as Path from "path";
+import * as fs from "fs";
+import { Bundler } from "module-bundler";
+import { JavascriptLoader } from "module-bundler/src/javascript-loader";
+import { JsxLoader } from "module-bundler/src/jsx-loader";
+
+const bundler = new Bundler();
+
+bundler.bundle({
+	entry: Path.resolve(__dirname, '../src/index.js'),
+	output: Path.resolve(__dirname, '../dist/index.js'),
+	loaders: [
+		new JavascriptLoader(),
+		new JsxLoader({ factory: 'React.createElement' })
+	]
+});
+
+fs.copyFileSync(Path.resolve(__dirname, '../src/index.html'), Path.resolve(__dirname, '../dist/index.html'));
+\end{verbatim}
+
+Najważniejszy fragment to wywołanie funkcji \verb|Bundler.bundle()|. Jako jedyny argument dostaje on obiekt będący konfiguracją przekazywaną do module bundlera. Pola w pliku konfiguracji to:
+\begin{itemize}
+    \item \verb|entry| -- ścieżka do wejściowego pliku javascript. Jest on elementem początkowym w grafie plików.
+    \item \verb|output| -- ścieżka (razem z nazwą pliku) gdzie ma znaleźć się wynikowy plik javascript.
+    \item \verb|loaders| -- tablica obiektów typu \verb|Loader|. Odpowiadają one za rozpoznawanie oraz przetwarzanie plików. Loadery użyte w aplikacji to:
+    \begin{itemize}
+        \item \verb|JavascriptLoader| -- odpowiada on za przetworzenie plików javascript.
+        \item \verb|JsxLoader| -- odpowiada on za przetwarzanie plików JSX. Są to pliki używane m.in. przez framework React, który pozwala wewnątrz plików używać składni podobnej do HTML.
+    \end{itemize}
+\end{itemize}
+
+Zawartość pliku \verb|generate-utils.ts| wygląda następująco:
+\begin{verbatim}
+    import { defaultPlugin, extractCSS } from "../../util-gen/src";
+import * as Path from "path";
+
+extractCSS({
+	input: Path.resolve(__dirname, '../src/**/*'),
+	output: Path.resolve(__dirname, '../dist/style.css'),
+	plugins: [defaultPlugin],
+	includeNormalize: true
+})
+\end{verbatim}
+
+Metoda \verb|extractCSS| służy do wygenerowania klas atomicznych. Otrzymuje ona obiekt konfiguracji o następujących polach:
+\begin{itemize}
+    \item \verb|input| -- wzorzec dopasowania ścieżki do plików, w których należy szukać użyć potencjalnych klas atomicznych.
+    \item \verb|output| -- ścieżka, pod jaką ma znaleźć się wyjściowy plik CSS.
+    \item \verb|plugins| -- tablica dołączonych pluginów, czyli obiektów deklarujących opisane wcześniej reguły i modyfikatory.
+    \item \verb|includeNormalize| -- opcja odpowiadająca za to, czy do wyjściowego pliku CSS należy dołączyć reguły z biblioteki CSS \verb|normalize.css|. Służy ona do ujednolicenia wyglądu elementów HTML we wszystkich przeglądarkach.
+\end{itemize}
+
+Oba te skrypty są wykonywane po raz pierwszy w momencie uruchomienia komendy \verb|npm run start|, a także za każdym razem, kiedy zostanie wykryte, że zawartość któregoś z plików źrodłowych uległa zmianie.
 
 \chapter{Podsumowanie i wnioski}
 Cel pracy został osiągnięty -- stworzono dwa działające oraz użyteczne narzędzia frontendowe -- module bundler oraz generator klas CSSowych.

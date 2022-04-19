@@ -1,7 +1,7 @@
-import { Bundler } from "../../module-bundler";
 import * as Path from "path";
-import { JavascriptLoader } from "../../module-bundler/src/javascript-loader";
 import * as fs from "fs";
+import { Bundler } from "module-bundler";
+import { JavascriptLoader } from "module-bundler/src/javascript-loader";
 import { JsxLoader } from "module-bundler/src/jsx-loader";
 
 const bundler = new Bundler();
