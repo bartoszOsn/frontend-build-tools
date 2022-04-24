@@ -117,14 +117,82 @@ Module bundler opisany w~tej pracy korzysta z~drugiej z~tych metod.
 
 
 \section{Testowanie module bundlera}
-Aby mieć pewność, że module bundler opisany w~tej pracy jest użyteczny a~także zgodny ze specyfikacją ES6 stworzone do niego dwa rodzaje testów: testy jednostowe oraz testy integracyjne.
+Aby mieć pewność, że module bundler opisany w~tej pracy jest użyteczny, a~także zgodny ze specyfikacją ES6 stworzone zostały do niego dwa rodzaje testów: testy jednostowe oraz testy integracyjne.
 
-Testów jednostkowych użyto, aby sprawdzić poprawność działania następujących, pojedynczych komponentów składających się na kod module bundlera:
-\begin{itemize}
-    \item Kod służący do transformowania kodu javascript na podstawie podanej konfiguracji, użyto go na przykład do transformowania wyrażeń importu na wyrażenia przypisania wartości do zmiennej.
-    \item Kod opisujący reguły transformowania wyrażeń eksportowania. Przykładowy test na wejściu otrzymuje kod \verb|export let a = 5;|, natomiast oczekiwany wynik to \verb|exports.a = 5;|.
-    \item Kod opisujący reguły transformowania wyrażeń importowania. Przykładowy test na wejściu otrzymuje kod \verb|import { export1 } from "module-name";|, natomiast oczekiwany wynik to \verb|const {export1: export1} = require('module-name');|.
-\end{itemize}
+W~repozytorium znajdują się następujące zestawy testów jednostkowych:
+\setlength\LTleft{0pt}
+\setlength\LTright{0pt}
+\begin{longtable}{@{\extracolsep{\fill}}|p{0.75\textwidth}|r|@{} }
+    \hline
+    \textbf{Opis testu}                                                                                                                                              & \textbf{Wynik testu} \\ \hline
+    \endfirsthead
+    %
+    \endhead
+    %
+    should return proper ast for `const {a: a} = fn("module")` expression                                   & pozytywny            \\ \hline
+    should return proper ast for `const {a: a, default: module} = fn("module")` expression                  & pozytywny            \\ \hline
+    should return proper ast for `const module = fn("module")` expression                                   & pozytywny            \\ \hline
+    should return proper ast for `const {a: a, b: c} = fn("module"), module = fn("module")` expression      & pozytywny            \\ \hline
+    \caption{ast-helpers.test.ts -- funkcje pomocnicze służące tworzeniu elementów z drzewa AST parsowanego kodu javascript.}
+\end{longtable}
+
+\begin{longtable}{@{\extracolsep{\fill}}|p{0.75\textwidth}|r|@{} }
+    \hline
+    \textbf{Opis testu}                                                                                                                                              & \textbf{Wynik testu} \\ \hline
+    \endfirsthead
+    %
+    \endhead
+    %
+    basic                                                                                                                                                            & pozytywny            \\ \hline
+    import into function                                                                                                                                             & pozytywny            \\ \hline
+    should provide proper block in transform function                                                                                                                & pozytywny            \\ \hline
+    should provide proper function block in transform function                                                                                                       & pozytywny            \\ \hline
+    \caption{javascript-transformer.test.ts -- testuje pomocnicze funkcje odpowiadające za przekształcanie kodu javascript.}
+\end{longtable}
+
+\begin{longtable}{@{\extracolsep{\fill}}|p{0.75\textwidth}|r|@{} }
+    \hline
+    \textbf{Opis testu}                                                                                                                                              & \textbf{Wynik testu} \\ \hline
+    \endfirsthead
+    %
+    \endhead
+    %
+    should transform "import defaultExport from \textbackslash{}"module-name\textbackslash{}";" into "const {default: defaultExport} = require('module-name');"                                                                                                         & pozytywny            \\ \hline
+    should transform "import * as name from \textbackslash{}"module-name\textbackslash{}";" into "const name = require('module-name');"                                                                                                                                 & pozytywny            \\ \hline
+    should transform "import { export1 } from \textbackslash{}"module-name\textbackslash{}";" into "const {export1: export1} = require('module-name');"                                                                                                                 & pozytywny            \\ \hline
+    should transform "import { export1 as alias1 } from \textbackslash{}"module-name\textbackslash{}";" into "const {export1: alias1} = require('module-name');"                                                                                                        & pozytywny            \\ \hline
+    should transform "import { export1 , export2 } from \textbackslash{}"module-name\textbackslash{}";" into "const {\textbackslash{}n    export1: export1,\textbackslash{}n    export2: export2\textbackslash{}n} = require('module-name');"                           & pozytywny            \\ \hline
+    should transform "import { export1 , export2 as alias2 } from \textbackslash{}"module-name\textbackslash{}";" into "const {\textbackslash{}n    export1: export1,\textbackslash{}n    export2: alias2\textbackslash{}n} = require('module-name');"                  & pozytywny            \\ \hline
+    should transform "import defaultExport, { export1 } from \textbackslash{}"module-name\textbackslash{}";" into "const {\textbackslash{}n    default: defaultExport,\textbackslash{}n    export1: export1\textbackslash{}n} = require('module-name');"                & pozytywny            \\ \hline
+    should transform "import defaultExport, * as name from \textbackslash{}"module-name\textbackslash{}";" into "const {default: defaultExport} = require('module-name'), name = require('module-name');"                                                               & pozytywny            \\ \hline
+    should transform "import \textbackslash{}"module-name\textbackslash{}";" into "require('module-name')"                                                                                                                                                              & pozytywny            \\ \hline
+    \caption{importSuite.ts -- testuje kod odpowiedzialny za przekształcanie wyrażeń importowania modułów ES6}
+\end{longtable}
+
+\begin{longtable}{@{\extracolsep{\fill}}|p{0.75\textwidth}|r|@{} }
+    \hline
+    \textbf{Opis testu}                                                                                                                                              & \textbf{Wynik testu} \\ \hline
+    \endfirsthead
+    %
+    \endhead
+    %
+    should transform "export let a;a = 5;" into "exports.a = void 0;\textbackslash{}nexports.a = 5;"                                                                    & pozytywny            \\ \hline
+    should transform "export let a, b;a = 5; b = 10;" into "(exports.a = void 0, exports.b = void 0)\textbackslash{}nexports.a = 5;\textbackslash{}nexports.b = 10;"    & pozytywny            \\ \hline
+    should transform "export let a = 5;" into "exports.a = 5;"                                                                                                          & pozytywny            \\ \hline
+    should transform "export let a = 5, b = 10;" into "(exports.a = 5, exports.b = 10)"                                                                                 & pozytywny            \\ \hline
+    should transform "export function func(){}" into "exports.func = function func() {\textbackslash{}n}"                                                               & pozytywny            \\ \hline
+    should transform "export class Cls {}" into "exports.Cls = class Cls {\textbackslash{}n}"                                                                           & pozytywny            \\ \hline
+    should transform "let a,b;export {a , b}" into "exports.a = a, exports.b = b;"                                                                                      & negatywny            \\ \hline
+    should transform "let a,b;export {a as aliasA, b as aliasB}" into "exports.aliasA = a, exports.aliasB = b;"                                                         & negatywny            \\ \hline
+    should transform "export const { a, b: c } = o;" into "exports.a = o.a, exports.b = o.c"                                                                            & negatywny            \\ \hline
+    should transform "export default expression;" into "exports.default = expression;"                                                                                  & negatywny            \\ \hline
+    should transform "export default function () {}" into "exports.default = function () {}"                                                                            & negatywny            \\ \hline
+    should transform "export default function a() {}" into "exports.default = function a() {}"                                                                          & negatywny            \\ \hline
+    should transform "export { a as default, b };" into "exports.default = a, exports.b = b;"                                                                           & negatywny            \\ \hline
+    \caption{exportSuite.ts -- testuje kod odpowiedzialny za przekształcanie wyrażeń exportowania modułów ES6}
+\end{longtable}
+
+Jak widać 7~z~13 testów sprawdzających poprawne przekształcanie wyrażeń eksportowania ma wynik negatywny. Module bundler opisywany w~tej pracy wspiera specyfikację ES6 tylko częściowo.
 
 W~repozytorium module bundlera znalazł się także jeden test integracyjny. Jest to bardzo prosta aplikacja rozbita na kilka plików, która wykonuje pewne asercje, których wynik polega na wartościach zaimportowanych z innych plików. Kod tej aplikacji jest bundlowany przy pomocy module bundlera, a następnie wykonywany wewnątrz testu frameworka \emph{Jest}\cite{jest}, służącego zazwyczaj do testów jednostkowych. Framework ten bada, czy wszystkie asercje wykonane w~ramach kodu są prawdą. Kod aplikacji testowej napisany jest w~taki sposób, że jeśli asercja okazałaby się fałszywa, znaczyłoby to błędnie zbundlowany kod.
 
@@ -272,30 +340,7 @@ Przede wszystkim, są one dostarczone tylko w~postaci biblioteki, co zmusza ich 
 
 kolejne możliwości dalszego rozwoju to:
 \begin{itemize}
-    \item Module bundler wspiera specyfikację ES6 tylko częściowo -- o ile wspiera użycie każdego sposobu importu, pozwala jednak tylko na około połowę opisanych przez specyfikację sposobów eksportowania symboli -- to, które sposoby eksportowania są wspierane, obrazują wyniki testów jednostkowych znajdujących się w~kodzie module bundlera:
-        \begin{longtable}{|p{13cm}|p{2cm}|}
-            \hline
-            \textbf{Opis testu}                                                                                                                                              & \textbf{Wynik testu} \\ \hline
-            \endfirsthead
-            %
-            \endhead
-            %
-            should transform "export let a;a = 5;" into "exports.a = void 0;\textbackslash{}nexports.a = 5;"                                                                 & pozytywny            \\ \hline
-            should transform "export let a, b;a = 5; b = 10;" into "(exports.a = void 0, exports.b = void 0)\textbackslash{}nexports.a = 5;\textbackslash{}nexports.b = 10;" & pozytywny            \\ \hline
-            should transform "export let a = 5;" into "exports.a = 5;"                                                                                                       & pozytywny            \\ \hline
-            should transform "export let a = 5, b = 10;" into "(exports.a = 5, exports.b = 10)"                                                                              & pozytywny            \\ \hline
-            should transform "export function func()\{\}" into "exports.func = function func() \{\textbackslash{}n\}"                                                        & pozytywny            \\ \hline
-            should transform "export class Cls \{\}" into "exports.Cls = class Cls \{\textbackslash{}n\}"                                                                    & pozytywny            \\ \hline
-            should transform "let a,b;export \{a, b\}" into "exports.a = a, exports.b = b;"                                                                                  & negatywny            \\ \hline
-            should transform "let a,b;export \{a as aliasA, b as aliasB\}" into "exports.aliasA = a, exports.aliasB = b;"                                                    & negatywny            \\ \hline
-            should transform "export const \{ a, b: c \} = o;" into "exports.a = o.a, exports.b = o.c"                                                                       & negatywny            \\ \hline
-            should transform "export default expression;" into "exports.default = expression;"                                                                               & negatywny            \\ \hline
-            should transform "export default function () \{\}" into "exports.default = function () \{\}"                                                                     & negatywny            \\ \hline
-            should transform "export default function a() \{\}" into "exports.default = function a() \{\}"                                                                   & negatywny            \\ \hline
-            should transform "export \{ a as default, b \};" into "exports.default = a, exports.b = b;"                                                                      & negatywny            \\ \hline
-            \caption{}
-            \label{tab:my-table}\\
-            \end{longtable}
+    \item Module bundler wspiera specyfikację ES6 tylko częściowo -- o ile wspiera użycie każdego sposobu importu, pozwala jednak tylko na około połowę opisanych przez specyfikację sposobów eksportowania symboli -- to, które sposoby eksportowania są wspierane, obrazują wyniki testów jednostkowych opisanych w~rozdziale dotyczącym testowania kodu module bundlera.
     \item generator klas CSSowych został stworzony z~myślą, aby łatwo było tworzyć nowe reguły i~modyfikatory, jednak reguły same w~sobie nie miały być jego częścią. Reguły są dostarczane jako \emph{pluginy} do samego generatora. Mimo to, w~kodzie generatora znalazł się jeden przykładowy plugin, nazwany \emph{defaultPlugin} z~kilkoma podstawowymi regułami, takimi jak marginesy lub kolory tła i tekstu. Dodanie do domyślnego pluginu kolejnych reguł, tak, aby dało się w pełni ostylować aplikację nie musząc tworzyć własnego pluginu na pewno dodałoby temu narzędziu pewną wartość.
 \end{itemize}
 
