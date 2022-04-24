@@ -73,12 +73,8 @@ Oto założenia, które muszą spełniać tworzone w tej pracy narzędzia:
     \item Utrzymanie kompatybilności wstecznej -- Specyfikacja javascript pozwala na importowanie oraz eksportowanie symboli z~oraz do plików, jednak zostało to zaimplementowane w najpopularniejszych przeglądarkach stosunkowo niedawno -- pierwsze wersje Google Chrome, Opery oraz Safari wspierające javascriptowe moduły zostały wydane w~2017 roku. Rok później dołączyły do nich Mozilla Firefox oraz Microsoft Edge.\cite{es6_modules_support}
 \end{itemize}
 
-Istnieje kilka formatów modułów javascript. Najpopularniejsze z~nich to UMD, CommonJS oraz format opisany w~specyfikacji ES6, przy czym UMD jest w~ostatnich latach coraz rzadziej używany.\cite{es6_for_humans}
 
-Module bundler stworzony na potrzeby tej pracy wspiera zarówno CommonJS jak i~ES6. Format opisany w~specyfikacji ES6 staje się coraz bardziej popularny i~możemy przewidywać, że w~przyszłości wyprze format CommonJS, na co może wskazywać chociażby to, że obecnie został on zaimplementowany tak w~przeglądarkach, jak i~w~środowisku Node.js, które wcześniej wspierało tylko CommonJS\cite{nodejs_modules}. Z~tego powodu module bundler opisany w tej pracy skupia się na ES6, jednak nie można było pominąć formatu CommonJS -- Używa go ogromna część najpopularniejszych bibliotek javascriptowych, w~tym np. React. Aby kod biblioteki został poprawnie zaimportowany w aplikacji module bundler musi wspierać format, z~jakiego korzysta ta biblioteka.
-
-
-\section{Sposoby bundlowania}
+\section{Sposób działania}
 % https://parceljs.org/features/scope-hoisting/
 Większość module bundlerów używa jednego z~dwóch sposobów na bundlowanie modułów: Korzystająć z~\emph{IIFE} lub używając techniki zwanej \emph{Scope Hoisting}, z~czego ta druga jest zdecydowanie częściej używana\cite{parcel_scope_hoisting}.
 
@@ -123,6 +119,85 @@ console.log($fa6943ce8a6b29$square(5));
 Druga najczęściej używana metoda polega na reprezentacji każdego modułu jako funkcji. W~momencie, kiedy jeden moduł importuje pewne symbole z~innego modułu, metoda reprezentująca zaimportowany moduł jest wykonywana. Następnie zwrócone wyniki zostają dostarczone do modułu importującego, a~także zapisane w~cache. Kiedy kolejny moduł zaimportuje coś z~tego samego modułu, funkcja nie wykona się kolejny raz. Zamiast tego, moduł dostanie wyniki z~cache. Jest to istotne, ponieważ w~specyfikacji Javascript moduły są singletonami\cite{object_oriented_javascript}. Oznacza to, że kiedy dwa moduły zaimportują te same symbole z~innego modułu, oba dostaną te same symbole, a~nie identyczne kopie. Jeśli więc jeden z tych modułów w~jakiś sposób zmieni coś w~jednym z zaimportowanych symboli, będzie to także miało efekt w~drugim module, który zaimportował ten symbol.
 
 Module bundler opisany w~tej pracy korzysta z~drugiej z~tych metod.
+
+Punktem początkowym tego module bundlera jest klasa \verb|Bundler| oraz jego najważniejsza metoda, \verb|bundle(options)|. Przyjmuje ona jako argument obiekt z dwoma polami: 
+\begin{itemize}
+    \item entry -- ścieżka do pliku wejściowego.
+    \item loaders -- tablice loaderów, czyli obiektów będących instancjami klasy \verb|Loader|.
+\end{itemize}
+
+\verb|Loader| to obiekt, który posiada metodę przetwarzającą moduł, oraz pole \verb|pattern|, które sprawdza, czy dany plik powinien być przetworzony właśnie przez ten loader. Pozwala to na użycie różnych rodzajów plików. Loadery zaimplementowane w kodzie to:
+\begin{itemize}
+    \item \verb|JavascriptLoader| -- najbardziej podstawowy loader, przetwarza on pliki javascript, m.in. zamienia on wszystkie wystąpienia składni \verb|import ... from ...| na wywołania pewnych funkcji.
+    \item \verb|JsxLoader| -- zamienia on pliki JSX -- używane przez bibliotekę React -- na pliki z czystym javascriptem. Następnie wykorzystuje \verb|JavascriptLoader| do przygotowania pliku do bycia częścią wyjściowego, zbundlowanego pliku.
+\end{itemize}
+
+Każdy z loaderów zwraca obiekt o danych polach:
+\begin{itemize}
+    \item hash -- unikalne id identyfikujące ten plik.
+    \item content -- zawartość pliku, już po przetworzeniu.
+    \item requireFunction -- nazwa funkcji, którą należy wywołać, aby zaimportować symbol z innego modułu.
+    \item moduleName -- ścieżka do tego pliku.
+    \item exportsName -- nazwa zmiennej, do której należy 
+    \item moduleExportsName -- 
+    \item importPaths --
+\end{itemize}
+
+Loader zamienia plik z takim kodem:
+\begin{verbatim}
+    import a from './a';
+
+    export const b = a.function();
+\end{verbatim}
+
+na plik o zawartości podobnej do tej:
+\begin{verbatim}
+    const {a: a} = $requireFuncton($idOfModuleA);
+
+    $moduleExportsName.$exportsName.b = a.function();
+\end{verbatim}
+
+Następnie każdy z takich przetworzonych modułów jest scalany za pomocą poniższego szablonu EJS:
+\begin{verbatim}
+    
+(() => {
+    const __bundler$<%- randomHash %> = {};
+    __bundler$<%- randomHash %>.modules = {
+        <% modules.forEach(module => { %>
+            "<%- module.hash %>": function(
+                <%- module.requireFunction %>,
+                <%- module.exportsName%>,
+                <%- module.moduleExportsName %>
+            ) {
+                <%- module.content%>
+            },
+        <% }) %>
+    }
+    __bundler$<%- randomHash %>.cached = {};
+
+    __bundler$<%- randomHash %>.requireFunction = function(hash) {
+        if (__bundler$<%- randomHash %>.cached[hash] === undefined) {
+            const exports = {};
+            const module = {
+                <%- modules[0].exportsName %>: exports
+            };
+            __bundler$<%- randomHash %>.modules[hash](
+                __bundler$<%- randomHash %>.requireFunction,
+                exports,
+                module
+            );
+            __bundler$<%- randomHash %>.cached[hash] =
+                module.<%- modules[0].exportsName %>
+        }
+
+        return __bundler$<%- randomHash %>.cached[hash];
+    }
+
+    __bundler$<%- randomHash %>.requireFunction("<%- modules[0].hash %>")
+})();
+\end{verbatim}
+
+gdzie \verb|modules| to tablica wcześniej opisanych obiektów zwracanych przez loader, z których każdy z nich reprezentuje jeden plik, a \verb|randomHash| to pewna losowa wartość.
 
 
 \section{Testowanie module bundlera}
