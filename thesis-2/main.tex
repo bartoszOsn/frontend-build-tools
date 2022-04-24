@@ -38,23 +38,32 @@ Współczesne aplikacje internetowe najczęściej składają się z~dwóch czę�
 
 Programowanie front--endowe jest jedną z najszybciej rozwijających się dziedzin programowania. Technologie, które pięć lat temu były zdecydowanymi liderami na rynku dziś są uważane za przestarzałe. Tak szybka ewolucja technik developerskich połączona z potrzebą kompatybilności wstecznej aplikacji internetowych (Właściciele aplikacji chcą, aby działały one dla jak największej grupy klientów, a~nie tylko dla tych, którzy posiadają najnowsze wersje przeglądarek) generuje problemy, które deweloperzy rozwiązują używając między innymi szerokiego zakresu narzędzi front--endowych.
 
-\section{Charakterystyka narzędzi front-endowych}
-Podstawową cechą narzędzi front--endowych -- być może jedyną cechą wspólną dla większości narzędzi -- jest sposób ich konfiguracji. Większość narzędzi jest dostosowana do uruchomienia na dwa sposoby:
-\begin{enumerate}
-    \item Poprzez \emph{Command Line Interface} -- CLI -- wykonując krótką komendę w wierszu poleceń takim jak np. Bash
-    \item Jako kod, najczęściej w języku Javascript -- narzędzie dostarczane jest developerowi jako biblioteka programistyczna. Programista tworzy plik, który wywołuje funkcje z~dostarczonej biblioteki z~odpowiednimi argumentami. Następnie za każdym razem, kiedy chce uruchomić narzędzie musi uruchomić stworzony przez siebie plik, np. przy użyciu środowiska Node.js, jeśli kod jest napisany w języku javascript.
-\end{enumerate}
-Wiele narzędzi pozwala na uruchomienie ich przy użyciu obu tych metod: poprzez CLI w~przypadkach, które nie wymagają skomplikowanej konfiguracji ani niestandardowych zachowań, oraz poprzez kod w~bardziej skomplikowanych sytuacjach.
-
-Wiele narzędzi łączy obie te metody w~taki sposób, że programista tworzy plik, np. javascript, który eksportuje obiekt definiujący konfigurację, a~następnie w~wierszu poleceń uruchamia narzędzie przekazując mu tylko jeden argument -- ścieżkę do wspomnianego wcześniej pliku.
-
-\section{Wybór typów narzędzi}
-Praca ta ma na celu przeanalizowanie działania dwóch typów narzędzi frontendowych:
+\section{Cel pracy}
+Celem pracy jest przeanalizowanie działania dwóch narzędzi używanych podczas developmentu aplikacji internetowych:
 \begin{itemize}
     \item Module bundler -- Narzędzie, które łączy kod aplikacji rozdzielony na wiele plików w~jeden plik, w~ten sposób zamieniając kod przyjazny deweloperowi na wydajny kod wspierający starsze przeglądarki, które nie pozwalały na nowoczesne metody importowania i eksportowania symboli w plikach javascript. Przykładami istniejących narzędzi tego typu są \emph{Webpack} oraz \emph{Parcel}
     \item Generator CSS--owych klas atomicznych -- Narzędzie, które przeszukuje kod aplikacji, szukając w niej nazw klas, dla których mogą być zdefiniowane pewne style CSS, a następnie generuje plik CSS z~odpowiednimi stylami. Przykładem może być \emph{Tailwind\cite{Tailwind_jit}} działający w trybie \emph{Just in Time} oraz \emph{UnoCSS\cite{unocss}}
 \end{itemize}
-Oba te typy narzędzi posiadają swoich przedstawicieli, na których będzie można się skupić podczas analizowania sposobu ich działania.
+
+Oto założenia, które muszą spełniać tworzone w tej pracy narzędzia:
+\begin{itemize}
+    \item Module bundler
+    \begin{itemize}
+        \item Narzędzie musi być uruchamiane oraz konfigurowane za pomocą skryptu javascript. Dodatkowym atutem byłaby możliwość uruchomienia narzędzia poprzez \emph{Command line interface}, jednak nie jest to konieczne.
+        \item Wyjściowy, pojedynczy plik Javascript musi mieć dokładnie takie samo działanie jak wiele wejściowych plików.
+        \item Narzędzie musi wspierać dwa formaty modułów javascript:
+        \begin{itemize}
+            \item CommonJS -- wyeksportowanie symbolu na zewnątrz modułu odbywa się poprzez przypisanie go do zmiennej \verb|module.exports|. Aby zaimportować jakiś symbol z innego modułu należy wywołać metodę \verb|require(path)|, która zwraca zawartość zmiennej \verb|module.exports| z importowanego symbolu. Format ten musi być wspierany w całości, ponieważ zewnętrze biblioteki zazwyczaj dostarczane są właśnie w tym formacie.
+            \item ESM (zwane też ES6 modules lub po prostu Javascript modules) -- format opisany w specyfikacji ES6. Import symbolu z innego modułu odbywa się poprzez użycie specjalnej składni \verb|import ... from ...|. Specyfikacja ES6 opisuje 10 różnych podtypów importowania\cite{es6_modules_import}. Export symbolu na zewnątrz modułu odbywa się poprzez użycie słowa kluczowego \verb|export|\cite{es6_modules_export}. Jako że format ESM jest używany zazwyczaj jedynie przez programistę używającego module bundlera, nie jest konieczne, aby module bundler wspierał wszystkie sposoby importowania i eksportowania. Ważne jest, aby module bundler wspierał kilka najczęściej używanych sposobów importu oraz eksportu, oraz aby programista używający module bundlera miał dostęp do informacji, których z nich może używać.
+        \end{itemize}
+    \end{itemize}
+    \item Generator atomicznych klas CSSowych.
+    \begin{itemize}
+        \item Generator musi być w stanie przeanalizować kod użytkownika oraz wygenerować plik CSS z potrzebnymi klasami atomicznymi.
+        \item Reguły, na podstawie których klasy są generowane muszą być łatwe do zdefiniowania dla użytkownika, tak, aby mógł on tworzyć własne rodzaje klas atomicznych do wygenerowania. definiowanie takiej reguły opisującej pewien zbiór klas atomicznych nie powinno być trudniejsze niż napisanie tych klas ręcznie.
+        \item Podobnie jak w przypadku module bundlera, generator klas atomicznych musi być możliwy do uruchomienia za pomocą skryptu javascript.
+    \end{itemize}
+\end{itemize}
 
 
 \chapter{Module bundler}
@@ -375,6 +384,14 @@ Axel Rauschmayer, \textit{Exploring JS}
 \bibitem{es6_modules_support}
 \textit{JavaScript modules -- JavaScript | MDN}
 \url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#browser_support} (dostęp 15.03.2022)
+
+\bibitem{es6_modules_import}
+\textit{import -- JavaScript | MDN}
+\url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#syntax} (dostęp 24.04.2022)
+
+\bibitem{es6_modules_export}
+\textit{export -- JavaScript | MDN}
+\url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export#syntax} (dostęp 24.04.2022)
 
 \bibitem{es6_for_humans}
 Grover D., Kunduru H.P. (2017) ES6 for Humans. Apress, Berkeley, CA.
