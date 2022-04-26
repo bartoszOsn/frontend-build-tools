@@ -339,13 +339,29 @@ W~generatorze klas CSSowych opisanym w~tej pracy definiowanie modyfikatorów jes
 
 
 \chapter{Przykładowa aplikacja stworzona przy użyciu zaprezentowanych narzędzi}
-Aby zaprezentować działanie obu narzędzi opisanych w~tej pracy stworzono prostą aplikację internetową, która używa obu z~nich.
-
+\nopagebreak
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{test-app.png}
-    \caption{Zrzut ekranu z~opisywanej aplikacji}
+    \begin{subfigure}{0.70\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{test-app-2.png}
+        \caption{Przed najechaniem kursorem na element}
+        \label{fig:test-app-hover-1}
+    \end{subfigure}
+
+    \begin{subfigure}{0.70\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{test-app-3.png}
+        \caption{Po najechaniu kursorem na element}
+        \label{fig:test-app-hover-b}
+    \end{subfigure}
+
+    \caption{Zrzuty ekranu z~opisywanej aplikacji. Po najechaniu kursorem na element zostaje on przekreślony.}
+    \label{fig:test-app-hover}
 \end{figure}
+\clearpage
+
+Aby zaprezentować działanie obu narzędzi opisanych w~tej pracy stworzono prostą aplikację internetową, która używa obu z~nich.
 
 Jest to prosta aplikacja, która pozwala uzupełnić listę rzeczy do zrobienia, a~następnie odznaczyć na niej poszczególne zadania jako zrobione.
 
@@ -355,26 +371,8 @@ Demonstruje ona użyteczność poszczególnych aspektów module bundlera oraz ge
     \item Aplikacja została stworzona w~oparciu o~bibliotekę React, co pokazuje, że module bundler jest w~stanie bez problemu odpowiednio przetworzyć kod zewnętrznej biblioteki dodany do aplikacji przy użyciu menadżera paczek, takiego jak npm lub yarn.
     \item Biblioteka React do importowania oraz eksportowania używa formatu CommonJS, wiadomo więc, że module bundler radzi sobie również z~nim.
     \item Aplikacja posiada style, a~jednak w~jej kodzie nie znajduje się żaden plik css -- generator klas cssowych generuje je na podstawie kodu.
-    \item Aplikacja używa również modyfikatorów, konkretnie modyfikatora hover -- po najechaniu na opis zadania zostaje on przekreślony.
+    \item Aplikacja używa również modyfikatorów -- po najechaniu na opis zadania zostaje on przekreślony. Za samo przekreślenie odpowiada reguła line-through, natomiast za zaaplikowanie tej reguły dopiero po najechaniu na element kursorem odpowiada modyfikator hover. (patrz: \ref{fig:test-app-hover})
 \end{itemize}
-
-\begin{figure}[h]
-    \centering
-    \begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=.9\linewidth]{test-app-2.png}
-    \caption{Przed najehaniem kursorem na element}
-    \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=.9\linewidth]{test-app-3.png}
-    \caption{Po najechaniu kursorem na element}
-    \label{fig:sub2}
-    \end{subfigure}
-    \caption{Po najechaniu kursorem na element zostaje on przekreślony. Za samo przekreślenie odpowiada reguła line-through, natomiast za zaaplikowanie tej reguły dopiero po najechaniu na element kursorem odpowiada modyfikator hover.}
-    \label{fig:test}
-\end{figure}
 
 Aby uruchomić aplikację, należy przejść do folderu \verb|test-application| i~uruchomić w~nim komendę \verb|npm run start|. Robi ona kilka rzeczy - tworzy serwer hostujący pliki pod adresem \verb|http://localhost:3000/|, nasłuchuje na zmiany w~kodzie źródłowym oraz -- co najważniejsze -- wykonuje on dwa skrypty z~folderu \verb|config| -- \verb|bundle.ts| oraz \verb|generate-utils.ts|. Służą one do uruchomienia -- kolejno -- module bundlera oraz generatora klas atomicznych.
 
