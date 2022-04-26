@@ -37,11 +37,11 @@
 \chapter{Wstęp}
 Współczesne aplikacje internetowe najczęściej składają się z~dwóch części: front--endowej oraz back--endowej. Rozróżnienie między nimi polega na tym, gdzie kod jest wykonywany -- jeśli jest on wykonywany po stronie serwera, mówimy o~back--endzie, natomiast jeśli obliczenia wykonywane są na komputerze użytkownika, jest to front--end.
 
-Programowanie front--endowe jest jedną z~najszybciej rozwijających się dziedzin programowania. Technologie, które pięć lat temu były zdecydowanymi liderami na rynku dziś są uważane za przestarzałe. Tak szybka ewolucja technik deweloperskich połączona z~potrzebą kompatybilności wstecznej aplikacji internetowych (właściciele aplikacji chcą, aby działały one dla jak największej grupy klientów, a~nie tylko dla tych, którzy posiadają najnowsze wersje przeglądarek) generuje problemy, które deweloperzy rozwiązują używając między innymi szerokiego zakresu narzędzi front--endowych.
+Programowanie front--endowe jest jedną z~najszybciej rozwijających się dziedzin programowania. Technologie, które pięć lat temu były zdecydowanymi liderami na rynku dziś są uważane za przestarzałe. Tak szybka ewolucja technik deweloperskich połączona z~potrzebą kompatybilności wstecznej aplikacji internetowych (właściciele aplikacji chcą, aby działały one dla jak największej grupy klientów, a~nie tylko dla tych, którzy posiadają najnowsze wersje przeglądarek) generuje problemy, które deweloperzy rozwiązują, używając między innymi szerokiego zakresu narzędzi front--endowych.
 
 Pierwszym celem pracy jest przeanalizowanie działania dwóch typów narzędzi używanych podczas programowania aplikacji internetowych: module bundlera i generatora CSS--owych klas atomicznych. Szczegółowym celem jest odtworzenie, czyli utworzenie autorskich wersji narzędzi tego typu na podstawie sformułowanych wymagań funkcjonalnych.
 
-W następnym rozdziale omówiono podstawową funkcjonalność istniejących i tworzonych narzędzi. W rozdziale 3 zostały przedstawione szczegóły działania module bundlera i opisano proces jego implementacji oraz testowania. W rozdziale 4 zostały omówione szczegóły działania i implementacji generatora CSS--owych klas atomicznych. Rozdział 5 zawiera krótki opis przykładowej aplikacji wykorzystującej utworzone narzędzia. W rozdziale 6 sformułowano wnioski podsumowujące pracę. Do pracy dołączono kody źródłowe zaimplementowanych narzędzi oraz aplikacji przykładowej, które stanowią integralną część pracy.
+W następnym rozdziale omówiono podstawową funkcjonalność istniejących i tworzonych narzędzi. W rozdziale 3 zostały przedstawione szczegóły działania module bundlera i opisano proces jego implementacji oraz testowania. W rozdziale 4 zostały omówione szczegóły działania i implementacji generatora CSS--owych klas atomicznych. Rozdział 5 zawiera krótki opis przykładowej aplikacji, do stworzenia której wykorzystano opisane w tej pracy narzędzia. W rozdziale 6 sformułowano wnioski podsumowujące pracę. Do pracy dołączono kody źródłowe zaimplementowanych narzędzi oraz aplikacji przykładowej, które stanowią integralną część pracy.
 
 \chapter{Wymagania funkcjonalne}
 
@@ -57,14 +57,14 @@ Istniejące, wymienione wyżej narzędzia nie zawsze spełniają wszystkie oczek
         \item Wyjściowy, pojedynczy plik Javascript musi mieć dokładnie takie samo działanie jak wiele wejściowych plików.
         \item Narzędzie musi wspierać dwa formaty modułów javascript:
         \begin{itemize}
-            \item CommonJS -- wyeksportowanie symbolu na zewnątrz modułu odbywa się poprzez przypisanie go do zmiennej \verb|module.exports|. Aby zaimportować jakiś symbol z~innego modułu należy wywołać metodę \verb|require(path)|, która zwraca zawartość zmiennej \verb|module.exports| z~importowanego symbolu. Format ten musi być wspierany w~całości, ponieważ zewnętrze biblioteki zazwyczaj dostarczane są właśnie w~tym formacie.
+            \item CommonJS -- wyeksportowanie symbolu na zewnątrz modułu odbywa się poprzez przypisanie go do zmiennej \verb|module.exports|. Aby zaimportować jakiś symbol z~innego modułu, należy wywołać metodę \verb|require(path)|, która zwraca zawartość zmiennej \verb|module.exports| z~importowanego symbolu. Format ten musi być wspierany w~całości, ponieważ zewnętrze biblioteki zazwyczaj dostarczane są właśnie w~tym formacie.
             \item ESM (zwane też ES6 modules lub po prostu Javascript modules) -- format opisany w~specyfikacji ES6. Import symbolu z~innego modułu odbywa się poprzez użycie specjalnej składni \verb|import ... from ...|. Specyfikacja ES6 opisuje 10 różnych podtypów importowania\cite{es6_modules_import}. Export symbolu na zewnątrz modułu odbywa się poprzez użycie słowa kluczowego \verb|export|\cite{es6_modules_export}. Jako że format ESM jest używany zazwyczaj jedynie przez programistę używającego module bundlera, nie jest konieczne, aby module bundler wspierał wszystkie sposoby importowania i~eksportowania. Ważne jest, aby module bundler wspierał kilka najczęściej używanych sposobów importu oraz eksportu, oraz aby programista używający module bundlera miał dostęp do informacji, których z~nich może używać.
         \end{itemize}
     \end{itemize}
     \item Generator atomicznych klas CSS--owych.
     \begin{itemize}
         \item Generator musi być w~stanie przeanalizować kod użytkownika oraz wygenerować plik CSS z~potrzebnymi klasami atomicznymi.
-        \item Reguły, na podstawie których klasy są generowane muszą być łatwe do zdefiniowania dla użytkownika, tak, aby mógł on tworzyć własne rodzaje klas atomicznych do wygenerowania. Definiowanie takiej reguły opisującej pewien zbiór klas atomicznych nie powinno być trudniejsze niż napisanie tych klas ręcznie.
+        \item Reguły, na podstawie których klasy są generowane, muszą być łatwe do zdefiniowania dla użytkownika, tak, aby mógł on tworzyć własne rodzaje klas atomicznych do wygenerowania. Definiowanie takiej reguły opisującej pewien zbiór klas atomicznych nie powinno być trudniejsze niż napisanie tych klas ręcznie.
         \item Podobnie jak w~przypadku module bundlera, generator klas atomicznych musi być możliwy do uruchomienia za pomocą skryptu javascript.
     \end{itemize}
 \end{itemize}
@@ -73,7 +73,7 @@ Istniejące, wymienione wyżej narzędzia nie zawsze spełniają wszystkie oczek
 \chapter{Module bundler}
 \emph{Module budler} to -- jak wspomniano wyżej -- narzędzie służące do scalania kodu znajdującego się w~wielu plikach w~jeden duży plik. Służy to kilku celom:
 \begin{itemize}
-    \item Zmniejszenie ilości zapytań do serwera -- Duże, komercyjne aplikacje nierzadko składają się z~setek lub tysięcy plików. Wdrożenie aplikacji rozdzielonej w~taki sposób wiązało by się z~wysyłaniem setek lub tysięcy zapytań z~przeglądarki na serwer podczas każdorazowego odwiedzenia strony. Byłoby to duże obciążenie dla przeglądarki oraz ogromne obciążenie dla serwera.
+    \item Zmniejszenie ilości zapytań do serwera -- Duże, komercyjne aplikacje nierzadko składają się z~setek lub tysięcy plików. Wdrożenie aplikacji rozdzielonej w~taki sposób wiązałoby się z~wysyłaniem setek lub tysięcy zapytań z~przeglądarki na serwer podczas każdorazowego odwiedzenia strony. Byłoby to duże obciążenie dla przeglądarki oraz ogromne obciążenie dla serwera.
     \item Utrzymanie kompatybilności wstecznej -- Specyfikacja javascript pozwala na importowanie oraz eksportowanie symboli z~oraz do plików, jednak zostało to zaimplementowane w~najpopularniejszych przeglądarkach stosunkowo niedawno -- pierwsze wersje Google Chrome, Opery oraz Safari wspierające javascriptowe moduły zostały wydane w~2017 roku. Rok później dołączyły do nich Mozilla Firefox oraz Microsoft Edge.\cite{es6_modules_support}
 \end{itemize}
 
@@ -84,7 +84,7 @@ Większość module bundlerów używa jednego z~dwóch sposobów na bundlowanie 
 
 \emph{Scope hoisting} polega na scaleniu zawartości każdego modułu w~jeden plik, jednocześnie zmieniając nazwy wszystkich symboli w~tym module, takich jak klasy, zmienne, stałe lub metody. Każda z~takich nazw staje się unikalna dla modułu, tak, aby symbole o~takiej samej nazwie pochodzące z~różnych modułów w~pliku wyjściowym miały inną nazwę.
 
-Oto przykład demonstrujący scope hoisting. Na wejściu mamy dwa pliki, "math.js" oraz "index.js".
+Oto przykład demonstrujący scope hoisting. Na wejściu mamy dwa pliki, ,,math.js'' oraz ,,index.js''.
 
 math.js:
 \begin{verbatim}
@@ -286,9 +286,9 @@ Jak widać 7~z~13 testów sprawdzających poprawne przekształcanie wyrażeń ek
 W~repozytorium module bundlera znalazł się także jeden test integracyjny. Jest to bardzo prosta aplikacja rozbita na kilka plików, która wykonuje pewne asercje, których wynik polega na wartościach zaimportowanych z~innych plików. Kod tej aplikacji jest bundlowany przy pomocy module bundlera, a~następnie wykonywany wewnątrz testu frameworka \emph{Jest}\cite{jest}, służącego zazwyczaj do testów jednostkowych. Framework ten bada, czy wszystkie asercje wykonane w~ramach kodu są prawdą. Kod aplikacji testowej napisany jest w~taki sposób, że jeśli asercja okazałaby się fałszywa, znaczyłoby to błędnie zbundlowany kod.
 
 \chapter{Generator CSS--owych klas atomicznych}
-Tradycyjne podejście do pisania kodu CSS polega wybieraniu konkretnych elementów html, a~następnie nadawaniu im serii reguł. Na przykład, mając na stronie okno dialogowe posiadające klasę ".dialog" w~pliku CSS określilibyśmy, że każdy element posiadający klasę ".dialog" musi być ponad wszystkimi innymi elementami, musi być wyśrodkowany na stronie, musi mieć białe tło oraz ciemny cień.
+Tradycyjne podejście do pisania kodu CSS polega wybieraniu konkretnych elementów html, a~następnie nadawaniu im serii reguł. Na przykład, mając na stronie okno dialogowe posiadające klasę ,,.dialog'' w~pliku CSS określilibyśmy, że każdy element posiadający klasę ,,.dialog'' musi być ponad wszystkimi innymi elementami, musi być wyśrodkowany na stronie, musi mieć białe tło oraz ciemny cień.
 
-Problemy z~takim podejściem pojawiają się, kiedy chcemy nadać style bardziej specyficznym elementom. Kontynuując poprzedni przykład, załóżmy, że w~naszym oknie dialogowym posiadamy przycisk, wewnątrz którego znajduje się element <img> wyświetlający kółko sugerujące że ma miejsce jakaś akcja i~przed naciśnięciem przycisku należy poczekać na jej zakończenie. Zazwyczaj takie ikony koła -- zwane loaderami -- obracają się wokół własnej osi. Taki ruch najłatwiej wymusić poprzez style CSS. Aby jednak nadać jakieś reguły temu elementowi, musimy napisać selektor, który mówi o~tym, że chcemy wybrać element \verb|<img>|, który znajduje się wewnątrz elementu \verb|<button>|, który znajduje się wewnątrz elementu posiadającego klasę ".dialog".
+Problemy z~takim podejściem pojawiają się, kiedy chcemy nadać style bardziej specyficznym elementom. Kontynuując poprzedni przykład, załóżmy, że w~naszym oknie dialogowym posiadamy przycisk, wewnątrz którego znajduje się element <img> wyświetlający kółko sugerujące że ma miejsce jakaś akcja i~przed naciśnięciem przycisku należy poczekać na jej zakończenie. Zazwyczaj takie ikony koła -- zwane loaderami -- obracają się wokół własnej osi. Taki ruch najłatwiej wymusić poprzez style CSS. Aby jednak nadać jakieś reguły temu elementowi, musimy napisać selektor, który mówi o~tym, że chcemy wybrać element \verb|<img>|, który znajduje się wewnątrz elementu \verb|<button>|, który znajduje się wewnątrz elementu posiadającego klasę ,,.dialog''.
 
 Takie podejście ma swoje wady, jednym z~nich jest potrzeba odzwierciedlenia struktury html wewnątrz pliku CSS, co jest żmudne oraz niepewne, biorąc pod uwagę, że struktura może się w~pewnym momencie zmienić.
 
@@ -296,15 +296,15 @@ Alternatywnym podejściem, wolnym od tych problemów jest użycie klas atomiczny
 
 
 \section{Czym są klasy atomiczne?}
-Klasy atomiczne to CSS--owe klasy, które mają do siebie przyporządkowaną tylko jedną regułę CSS. Klasa ".dialog" opisywana wyżej nie jest klasą atomiczną, jednak można ją zastąpić kilkoma innymi klasami atomicznymi:
+Klasy atomiczne to CSS--owe klasy, które mają do siebie przyporządkowaną tylko jedną regułę CSS. Klasa ,,.dialog'' opisywana wyżej nie jest klasą atomiczną, jednak można ją zastąpić kilkoma innymi klasami atomicznymi:
 \begin{itemize}
-    \item klasa z~regułą określającą, że element z~tą klasą musi być wyświetlany ponad wszystkimi innymi, np. ".z-10000" i~odpowiadająca jej reguła "z-index: 10000"
-    \item kilka klas z~regułami powalającymi wycentrować element, np. "display: flex" oraz "align-items: center"
-    \item klasa z~regułą odpowiadająca kolorowi tła, np. ".bg-white" i~reguła: "background-color: white"
+    \item klasa z~regułą określającą, że element z~tą klasą musi być wyświetlany ponad wszystkimi innymi, np. ,,.z-10000'' i~odpowiadająca jej reguła ,,z-index: 10000''
+    \item kilka klas z~regułami powalającymi wycentrować element, np. ,,display: flex'' oraz ,,align-items: center''
+    \item klasa z~regułą odpowiadająca kolorowi tła, np. ,,.bg-white'' i~reguła: ,,background-color: white''
     \item klasa z~regułą definującą cień
 \end{itemize}
 
-Chcąc sprawić, aby nasz loader się obracał, wystarczyłoby nadać mu odpowiednią klasę atomiczną, np. ".spin". W~ten sposób nie polegalibyśmy już na strukturze HTML, tak, jak robiliśmy to w~poprzednim podejściu.
+Chcąc sprawić, aby nasz loader się obracał, wystarczyłoby nadać mu odpowiednią klasę atomiczną, np. ,,.spin''. W~ten sposób nie polegalibyśmy już na strukturze HTML, tak, jak robiliśmy to w~poprzednim podejściu.
 
 
 \section{Powody używania generatora klas atomicznych}
